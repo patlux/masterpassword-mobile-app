@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "expo": "34.0.4",
+    "expo-document-picker": "6.0.0",
+    "expo-file-system": "6.0.2",
     "react": "16.9.0",
     "react-dom": "16.9.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-34.0.0.tar.gz",
