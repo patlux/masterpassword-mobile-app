@@ -1,54 +1,49 @@
 import React from 'react';
-import { Text, View, Button } from 'react-native';
-
-import * as DocumentPicker from 'expo-document-picker';
-import * as FileSystem from 'expo-file-system';
-
-import { createAppContainer } from 'react-navigation';
+import {
+  createAppContainer,
+  createSwitchNavigator,
+  NavigationInjectedProps,
+} from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
+import { ActivityIndicator } from 'react-native-paper';
 
-function HomeScreen() {
-  const [file, setFile] = React.useState<DocumentPicker.DocumentResult>(null);
-  const [content, setContent] = React.useState(null);
+import LoginScreen from './Auth/Login';
+import AuthContext from './Auth/AuthContext';
+import HomeScreen from './Home';
+import { View, StatusBar } from 'react-native';
 
-  async function onPress() {
-    const result = await DocumentPicker.getDocumentAsync({
-      type: '*/*',
-      copyToCacheDirectory: true,
-    });
-    setFile(result);
-  }
+function AuthLoadingScreen({ navigation }: NavigationInjectedProps) {
+  const { name, password } = React.useContext(AuthContext);
 
   React.useEffect(() => {
-    if (!file) {
+    if (name && password) {
+      navigation.navigate('App');
       return;
     }
-    FileSystem.readAsStringAsync(file.uri, { encoding: 'utf8' }).then(
-      result => {
-        setContent(result);
-      },
-    );
-  }, [file]);
 
-  console.log({ file, content });
+    navigation.navigate('Auth');
+  }, []);
 
   return (
-    <View>
-      {file && <Text>Filename: {file.name}</Text>}
-
-      <Button onPress={onPress} title="Select a file"></Button>
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <ActivityIndicator color="black" size="large" />
+      <StatusBar barStyle="default" />
     </View>
   );
 }
 
-HomeScreen.navigationOptions = {
-  title: 'Passwords',
-};
+const AppStack = createStackNavigator({ Home: HomeScreen });
+const AuthStack = createStackNavigator({ Login: LoginScreen });
 
-const AppNavigator = createStackNavigator({
-  Home: {
-    screen: HomeScreen,
-  },
-});
-
-export default createAppContainer(AppNavigator);
+export default createAppContainer(
+  createSwitchNavigator(
+    {
+      AuthLoading: AuthLoadingScreen,
+      App: AppStack,
+      Auth: AuthStack,
+    },
+    {
+      initialRouteName: 'AuthLoading',
+    },
+  ),
+);
