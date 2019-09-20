@@ -1,23 +1,53 @@
 import React from 'react';
-import { View } from 'react-native';
-import { TextInput, Button } from 'react-native-paper';
+import { View, TouchableOpacity } from 'react-native';
+import { TextInput, Button, Checkbox, Text } from 'react-native-paper';
 import { NavigationInjectedProps } from 'react-navigation';
+import * as SecureStore from 'expo-secure-store';
 
 import AuthContext from '../Auth/AuthContext';
 import ScreenHeader from '../components/ScreenHeader';
 
 function LoginScreen({ navigation }: NavigationInjectedProps) {
   const { name, password, login } = React.useContext(AuthContext);
-  console.log('LoginScreen', { name, password });
+
+  const [loading, setLoading] = React.useState(false);
 
   const [formValues, setFormValues] = React.useState({
     name: name || '',
     password: password || '',
+    rememberPassword: null,
   });
 
-  function onSubmit() {
-    console.log('onSubmit', { name, password });
-    login({ name: formValues.name, password: formValues.password });
+  function toggleRememberPassword() {
+    setFormValues({
+      ...formValues,
+      rememberPassword: !formValues.rememberPassword,
+    });
+  }
+
+  async function onSubmit() {
+    try {
+      setLoading(true);
+      if (formValues.rememberPassword) {
+        // TODO: ask for fingerprint to store the password
+        //       there is no way to encrypt the password with the fingerprint
+        //       but it's necessary to give the user a feeling of security
+        await SecureStore.setItemAsync('password', formValues.password, {
+          keychainAccessible: SecureStore.WHEN_UNLOCKED,
+        });
+      } else {
+        // TODO: check if a stored password exists,
+        //       and ask the user if its ok to delete it
+        await SecureStore.deleteItemAsync('password');
+      }
+      setLoading(false);
+      login({ name: formValues.name, password: formValues.password });
+    } catch (exception) {
+      if (__DEV__) {
+        console.error('Error while `onSubmit`:', exception);
+      }
+      setLoading(false);
+    }
   }
 
   React.useEffect(() => {
@@ -25,6 +55,19 @@ function LoginScreen({ navigation }: NavigationInjectedProps) {
       navigation.navigate('App');
     }
   }, [navigation, name, password]);
+
+  React.useEffect(() => {
+    // TODO: ask first for fingerprint
+    SecureStore.getItemAsync('password').then(password => {
+      if (password) {
+        setFormValues(formValues => ({
+          ...formValues,
+          password,
+          rememberPassword: true,
+        }));
+      }
+    });
+  }, []);
 
   return (
     <View style={{ flex: 1 }}>
@@ -53,6 +96,20 @@ function LoginScreen({ navigation }: NavigationInjectedProps) {
           autoCorrect={false}
           textContentType="password"
         />
+        <TouchableOpacity
+          style={{
+            marginBottom: 10,
+          }}
+          onPress={toggleRememberPassword}
+        >
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Checkbox.Android
+              status={formValues.rememberPassword ? 'checked' : 'unchecked'}
+              onPress={toggleRememberPassword}
+            />
+            <Text>Remember password</Text>
+          </View>
+        </TouchableOpacity>
         <Button mode="contained" onPress={onSubmit}>
           Sign In
         </Button>
