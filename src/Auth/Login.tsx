@@ -83,6 +83,7 @@ function LoginScreen({ navigation }: NavigationInjectedProps) {
           autoCompleteType="username"
           autoCorrect={false}
           autoCapitalize="none"
+          disabled={loading}
         />
         <TextInput
           mode="flat"
@@ -95,6 +96,7 @@ function LoginScreen({ navigation }: NavigationInjectedProps) {
           autoCompleteType="password"
           autoCorrect={false}
           textContentType="password"
+          disabled={loading}
         />
         <TouchableOpacity
           style={{
@@ -106,11 +108,12 @@ function LoginScreen({ navigation }: NavigationInjectedProps) {
             <Checkbox.Android
               status={formValues.rememberPassword ? 'checked' : 'unchecked'}
               onPress={toggleRememberPassword}
+              disabled={loading}
             />
             <Text>Remember password</Text>
           </View>
         </TouchableOpacity>
-        <Button mode="contained" onPress={onSubmit}>
+        <Button mode="contained" onPress={onSubmit} loading={loading}>
           Sign In
         </Button>
       </View>
