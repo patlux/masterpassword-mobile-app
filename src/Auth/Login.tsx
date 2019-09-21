@@ -9,14 +9,18 @@ import ScreenHeader from '../components/ScreenHeader';
 
 function LoginScreen({ navigation }: NavigationInjectedProps) {
   const { name, password, login } = React.useContext(AuthContext);
-
   const [loading, setLoading] = React.useState(false);
-
   const [formValues, setFormValues] = React.useState({
     name: name || '',
     password: password || '',
     rememberPassword: null,
   });
+
+  React.useEffect(() => {
+    if (name && password) {
+      navigation.navigate('App');
+    }
+  }, [navigation, name, password]);
 
   function toggleRememberPassword() {
     setFormValues({
@@ -49,25 +53,6 @@ function LoginScreen({ navigation }: NavigationInjectedProps) {
       setLoading(false);
     }
   }
-
-  React.useEffect(() => {
-    if (name && password) {
-      navigation.navigate('App');
-    }
-  }, [navigation, name, password]);
-
-  React.useEffect(() => {
-    // TODO: ask first for fingerprint
-    SecureStore.getItemAsync('password').then(password => {
-      if (password) {
-        setFormValues(formValues => ({
-          ...formValues,
-          password,
-          rememberPassword: true,
-        }));
-      }
-    });
-  }, []);
 
   return (
     <View style={{ flex: 1 }}>

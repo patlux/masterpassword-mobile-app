@@ -4,8 +4,10 @@ import React from 'react';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { AsyncStorage } from 'react-native';
 import { AppLoading, SplashScreen } from 'expo';
+import * as SecureStore from 'expo-secure-store';
 
 import AuthContext from './src/Auth/AuthContext';
+import { getPersistenceFunctions } from './src/Utils/Navigation';
 import Root from './src';
 
 export default function App() {
@@ -17,14 +19,19 @@ export default function App() {
   }
 
   React.useEffect(() => {
-    AsyncStorage.getItem('name')
-      .then(name => {
-        console.log('name received:', name);
-        setUser(user => ({ ...user, name }));
+    Promise.all([
+      AsyncStorage.getItem('name'),
+      SecureStore.getItemAsync('password'),
+    ])
+      .then(([name, password]) => {
+        setUser(user => ({ ...user, name, password }));
         setIsReady(true);
       })
       .catch(error => {
-        console.error(error);
+        console.error(
+          "Error white loading 'name'/'password' from storage:",
+          error,
+        );
         setIsReady(true);
       });
   }, []);
@@ -52,7 +59,7 @@ export default function App() {
       value={{ name: user.name, password: user.password, login }}
     >
       <PaperProvider>
-        <Root />
+        <Root {...getPersistenceFunctions()} />
       </PaperProvider>
     </AuthContext.Provider>
   );
