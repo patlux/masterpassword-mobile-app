@@ -5,6 +5,7 @@ import { Provider as PaperProvider } from 'react-native-paper';
 import { AsyncStorage } from 'react-native';
 import { AppLoading, SplashScreen } from 'expo';
 import * as SecureStore from 'expo-secure-store';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import AuthContext from './src/Auth/AuthContext';
 import { getPersistenceFunctions } from './src/Utils/Navigation';
@@ -59,7 +60,9 @@ export default function App() {
       value={{ name: user.name, password: user.password, login }}
     >
       <PaperProvider>
-        <Root {...getPersistenceFunctions()} />
+        <SafeAreaProvider>
+          <Root {...getPersistenceFunctions()} />
+        </SafeAreaProvider>
       </PaperProvider>
     </AuthContext.Provider>
   );
