@@ -7,6 +7,7 @@ import { AppLoading, SplashScreen } from 'expo';
 import * as SecureStore from 'expo-secure-store';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import MPW from './src/Utils/mpw/mpw';
 import AuthContext from './src/Auth/AuthContext';
 import { getPersistenceFunctions } from './src/Utils/Navigation';
 import Root from './src';
@@ -14,6 +15,7 @@ import Root from './src';
 export default function App() {
   const [isReady, setIsReady] = React.useState(false);
   const [user, setUser] = React.useState({ name: null, password: null });
+  const mpwRef = React.useRef<MPW>();
 
   function login(newUser) {
     setUser(newUser);
@@ -26,7 +28,6 @@ export default function App() {
     ])
       .then(([name, password]) => {
         setUser(user => ({ ...user, name, password }));
-        setIsReady(true);
       })
       .catch(error => {
         console.error(
@@ -51,13 +52,20 @@ export default function App() {
     }
   }, [isReady]);
 
+  React.useEffect(() => {
+    if (user.name && user.password) {
+      mpwRef.current = new MPW(user.name, user.password);
+      setIsReady(true);
+    }
+  }, [user]);
+
   if (!isReady) {
     return <AppLoading autoHideSplash={false} />;
   }
 
   return (
     <AuthContext.Provider
-      value={{ name: user.name, password: user.password, login }}
+      value={{ name: user.name, password: user.password, login, mpwRef }}
     >
       <PaperProvider>
         <SafeAreaProvider>
