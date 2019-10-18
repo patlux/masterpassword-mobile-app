@@ -1,17 +1,18 @@
 {
   "expo": {
-    "name": "Masterpassword Mobile App",
-    "slug": "masterpassword-mobile-app",
+    "name": "MPW",
+    "slug": "mpw",
     "privacy": "public",
     "sdkVersion": "35.0.0",
     "platforms": ["ios", "android", "web"],
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+    "primaryColor": "#788968",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#788968"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -19,10 +20,21 @@
     "assetBundlePatterns": ["assets/**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "de.patwoz.masterpasswordmobileapp"
+      "bundleIdentifier": "de.patwoz.mpw",
+      "buildNumber": "1",
+      "usesIcloudStorage": false,
+      "usesAppleSignIn": false,
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
-      "package": "de.patwoz.masterpasswordmobileapp"
+      "package": "de.patwoz.mpw",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon-transp.png",
+        "backgroundColor": "#788968"
+      }
     }
   }
 }
