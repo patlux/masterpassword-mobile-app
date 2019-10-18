@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { AppLoading, SplashScreen } from 'expo';
+import { AppLoading } from 'expo';
 import * as SecureStore from 'expo-secure-store';
 
 import MPW from '../Utils/mpw/mpw';
@@ -11,23 +11,17 @@ export interface Props {
 
 function AuthProvider({ children }: Props) {
   const [isReady, setIsReady] = React.useState(false);
-  React.useEffect(() => {
-    if (isReady) {
-      SplashScreen.hide();
-    }
-  }, [isReady]);
-
   const [user, setUser] = React.useState<IAuthUser>(null);
 
   const mpwRef = React.useRef<MPW>();
   React.useEffect(() => {
     console.log('user changed:', user);
     if (user && user.name && user.password) {
+      console.log('calculate with mpw ...');
+      const start = new Date().getTime();
       mpwRef.current = new MPW(user.name, user.password);
-      setIsReady(true);
-    } else {
-      // TODO: show error?
-      setIsReady(true);
+      const end = new Date().getTime();
+      console.log('calculation finished in:', end - start);
     }
   }, [user]);
 
@@ -38,6 +32,7 @@ function AuthProvider({ children }: Props) {
     ])
       .then(([name, password]) => {
         setUser(user => ({ ...user, name, password }));
+        setIsReady(true);
       })
       .catch(error => {
         console.error(
@@ -51,7 +46,7 @@ function AuthProvider({ children }: Props) {
   console.log('AuthProvider', 'render()', { isReady, user });
 
   if (!isReady) {
-    return <AppLoading autoHideSplash={false} />;
+    return <AppLoading autoHideSplash={true} />;
   }
 
   function login(newUser) {
