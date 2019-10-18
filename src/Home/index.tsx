@@ -1,138 +1,93 @@
 import React from 'react';
-import { Text, View } from 'react-native';
-import * as DocumentPicker from 'expo-document-picker';
-import * as FileSystem from 'expo-file-system';
-import { FlatList } from 'react-navigation';
-import { Button, Card, Paragraph } from 'react-native-paper';
+import { View, StyleSheet, Alert } from 'react-native';
+import { NavigationInjectedProps } from 'react-navigation';
+import { Button, Paragraph, FAB } from 'react-native-paper';
+import { useSafeArea } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 
-import MPW from '../Utils/mpw/mpw';
-
-import {
-  parse,
-  IMpwAppCliConfigFile,
-  IMpwAppCliConfigSite,
-} from '../Utils/Import';
 import AuthContext from '../Auth/AuthContext';
+import { useSites, ISite } from '../Site/SitesContext';
+import SiteList from './SiteList';
 
-function HomeScreen() {
-  const { name, password } = React.useContext(AuthContext);
-  console.log('HomeScreen', { name, password });
+function HomeScreen({ navigation }: NavigationInjectedProps) {
+  const { logout } = React.useContext(AuthContext);
+  const { sites } = useSites();
+  const insets = useSafeArea();
 
-  const mpwRef = React.useRef<MPW>();
-  React.useEffect(() => {
-    console.time('mpw::init');
-    mpwRef.current = new MPW(name, password);
-    console.timeEnd('mpw::init');
-  }, [name, password]);
-
-  const [file, setFile] = React.useState<DocumentPicker.DocumentResult>(null);
-  const [content, setContent] = React.useState(null);
-  const [mpwCliConfig, setMpwCliConfig] = React.useState<IMpwAppCliConfigFile>(
-    null,
-  );
-  const [sites, setSites] = React.useState<
-    Array<IMpwAppCliConfigSite & { __siteName: string }>
-  >([]);
-
-  async function onPress() {
-    const result = await DocumentPicker.getDocumentAsync({
-      type: '*/*',
-      copyToCacheDirectory: true,
-    });
-    setFile(result);
+  function onPressFab() {
+    navigation.navigate('Site');
   }
 
-  React.useEffect(() => {
-    if (!file) {
-      return;
-    }
-    FileSystem.readAsStringAsync(file.uri, { encoding: 'utf8' }).then(
-      result => {
-        setContent(result);
-      },
-    );
-  }, [file]);
+  const onPressLogout = React.useCallback(() => {
+    logout();
+    navigation.navigate('Auth');
+  }, [logout]);
 
   React.useEffect(() => {
-    if (!content) {
-      return;
-    }
-    const result = parse(content);
-    if (result) {
-      setMpwCliConfig(result);
-    }
-  }, [content]);
+    navigation.setParams({ logout: onPressLogout });
+  }, [logout]);
 
-  React.useEffect(() => {
-    if (!mpwCliConfig) {
-      return;
-    }
-    setSites(
-      Object.keys(mpwCliConfig.sites).map(siteName => ({
-        __siteName: siteName,
-        ...mpwCliConfig.sites[siteName],
-      })),
-    );
-  }, [mpwCliConfig]);
-
-  console.log({ sites });
-
-  if (!Array.isArray(sites) || sites.length === 0) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        {file && <Text>Filename: {file.name}</Text>}
-        <Paragraph>It seems you didn't added sites yet.</Paragraph>
-        <Button onPress={onPress} mode="outlined" style={{ marginTop: 15 }}>
-          Import sites from file
-        </Button>
-      </View>
-    );
+  function onPressSite(site: ISite) {
+    navigation.navigate('Site', { site });
   }
 
   return (
-    <FlatList
-      keyExtractor={item => item.__siteName}
-      data={sites}
-      renderItem={({ item: site }) => (
-        <Card
-          key={site.__siteName}
-          style={{ marginHorizontal: 10, marginVertical: 5 }}
-          onPress={() => {
-            console.log('Card:', 'onPress');
-            if (mpwRef.current) {
-              console.log(`generate password for ${site.__siteName}`);
-              mpwRef.current
-                .generateAuthentication(
-                  site.__siteName,
-                  site.counter,
-                  '',
-                  site.algorithm,
-                )
-                .then(password => {
-                  console.log({ password });
-                });
-            }
+    <>
+      {Array.isArray(sites) && sites.length > 0 ? (
+        <SiteList onPressSite={onPressSite} />
+      ) : (
+        <View
+          style={{
+            flex: 1,
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
           }}
         >
-          <Card.Title title={site.__siteName} subtitle={site.counter} />
-          <Card.Content>
-            <Paragraph>****</Paragraph>
-          </Card.Content>
-        </Card>
+          <Paragraph>It seems you didn't added sites yet.</Paragraph>
+          <Button
+            onPress={() => navigation.navigate('Import')}
+            mode="outlined"
+            style={{ marginTop: 15 }}
+          >
+            Import sites from file
+          </Button>
+        </View>
       )}
-    />
+      <FAB
+        style={[styles.fab, { bottom: insets.bottom }]}
+        icon={({ size, color }) => (
+          <Ionicons
+            size={size}
+            color={color}
+            name="md-add"
+            style={{ alignSelf: 'center' }}
+          />
+        )}
+        onPress={onPressFab}
+      />
+    </>
   );
 }
 
-HomeScreen.navigationOptions = {
-  title: 'Passwords',
+HomeScreen.navigationOptions = ({ navigation }) => {
+  return {
+    title: 'Sites',
+    headerRight: (
+      <Button onPress={navigation.getParam('logout')}>
+        <Ionicons name="md-exit" size={24} />
+      </Button>
+    ),
+  };
 };
+
+const styles = StyleSheet.create({
+  fab: {
+    position: 'absolute',
+    margin: 16,
+    right: 0,
+    bottom: 0,
+  },
+});
 
 export default HomeScreen;

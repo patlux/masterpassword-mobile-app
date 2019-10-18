@@ -1,26 +1,19 @@
 import React from 'react';
-import { View, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
 import { TextInput, Button, Checkbox, Text } from 'react-native-paper';
-import { NavigationInjectedProps } from 'react-navigation';
 import * as SecureStore from 'expo-secure-store';
 
 import AuthContext from '../Auth/AuthContext';
 import ScreenHeader from '../components/ScreenHeader';
 
-function LoginScreen({ navigation }: NavigationInjectedProps) {
+function LoginScreen() {
   const { name, password, login } = React.useContext(AuthContext);
   const [loading, setLoading] = React.useState(false);
   const [formValues, setFormValues] = React.useState({
     name: name || '',
     password: password || '',
-    rememberPassword: null,
+    rememberPassword: false,
   });
-
-  React.useEffect(() => {
-    if (name && password) {
-      navigation.navigate('App');
-    }
-  }, [navigation, name, password]);
 
   function toggleRememberPassword() {
     setFormValues({
@@ -32,6 +25,7 @@ function LoginScreen({ navigation }: NavigationInjectedProps) {
   async function onSubmit() {
     try {
       setLoading(true);
+      await SecureStore.setItemAsync('name', formValues.name);
       if (formValues.rememberPassword) {
         // TODO: ask for fingerprint to store the password
         //       there is no way to encrypt the password with the fingerprint
@@ -44,6 +38,10 @@ function LoginScreen({ navigation }: NavigationInjectedProps) {
         //       and ask the user if its ok to delete it
         await SecureStore.deleteItemAsync('password');
       }
+      await SecureStore.setItemAsync(
+        'rememberPassword',
+        formValues.rememberPassword ? 'yes' : 'no',
+      );
       setLoading(false);
       login({ name: formValues.name, password: formValues.password });
     } catch (exception) {
@@ -55,7 +53,7 @@ function LoginScreen({ navigation }: NavigationInjectedProps) {
   }
 
   return (
-    <View style={{ flex: 1 }}>
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding" enabled>
       <ScreenHeader>Login</ScreenHeader>
       <View style={{ flex: 1, paddingHorizontal: '10%' }}>
         <TextInput
@@ -102,7 +100,7 @@ function LoginScreen({ navigation }: NavigationInjectedProps) {
           Sign In
         </Button>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 

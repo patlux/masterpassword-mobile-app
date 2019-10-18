@@ -16,7 +16,7 @@ function ScreenHeader({ children }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 0.5,
     justifyContent: 'center',
     alignItems: 'center',
   },

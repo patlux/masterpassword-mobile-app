@@ -1,0 +1,47 @@
+import React from 'react';
+import { Button, Dialog, List, DialogProps } from 'react-native-paper';
+
+import MPW from '../Utils/mpw/mpw';
+import { ScrollView } from 'react-native';
+
+export interface Props {
+  onDone: (passwordType: string) => void;
+}
+
+function DialogPasswordType({
+  onDone,
+  ...props
+}: Props & Omit<DialogProps, 'children'>) {
+  function onSelected(passwordType: string) {
+    return () => {
+      if (!onDone) {
+        return;
+      }
+      onDone(passwordType);
+    };
+  }
+
+  return (
+    <Dialog {...props}>
+      <Dialog.Title>Password types</Dialog.Title>
+      <Dialog.ScrollArea>
+        <ScrollView>
+          <List.Section>
+            {Object.keys(MPW.templates).map(passwordTypeKey => (
+              <List.Item
+                key={passwordTypeKey}
+                title={passwordTypeKey}
+                onPress={onSelected(passwordTypeKey)}
+              />
+            ))}
+          </List.Section>
+        </ScrollView>
+      </Dialog.ScrollArea>
+      <Dialog.Actions>
+        <Button onPress={props.onDismiss}>Cancel</Button>
+      </Dialog.Actions>
+    </Dialog>
+  );
+}
+
+export default DialogPasswordType;

@@ -1,6 +1,6 @@
 import { AsyncStorage } from 'react-native';
 
-const navigationPersistenceKey = 'navigationState';
+export const navigationPersistenceKey = 'navigationState';
 
 export const persistNavigationState = async navState => {
   try {

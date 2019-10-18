@@ -9,6 +9,7 @@ export interface IAuthUser {
 
 export interface IAuthContext extends IAuthUser {
   login: (user: IAuthUser) => void;
+  logout: () => void;
   mpwRef: MPW;
 }
 
@@ -16,6 +17,7 @@ const AuthContext = React.createContext<IAuthContext>({
   name: null,
   password: null,
   login: (user: IAuthUser) => {},
+  logout: () => {},
   mpwRef: null,
 });
 
@@ -31,23 +33,23 @@ export const useMPW = (): MPW => {
 
 export interface IUseMPWPassword {
   name: string;
-  counter: number;
+  counter: number | string;
   type: string;
 }
 
-export const useMPWPassword = ({
-  name,
-  counter,
-  type,
-}: IUseMPWPassword): string => {
-  console.log('useMPWPassword()', { name, counter, type });
-
+export const useMPWPassword = (
+  { name, counter, type }: IUseMPWPassword,
+  generate: boolean = true,
+): string => {
   const mpwRef = useMPW();
   const [password, setPassword] = React.useState<string>(null);
 
   React.useEffect(() => {
+    if (!generate) {
+      return;
+    }
     if (!mpwRef.current) {
-      console.warn('mpwRef is not defined');
+      console.warn('mpwRef.current is not defined');
     }
     if (!name || name.trim().length === 0) {
       setPassword('');
@@ -61,7 +63,7 @@ export const useMPWPassword = ({
         type,
       )
       .then(password => setPassword(password));
-  }, [name, counter, type]);
+  }, [name, counter, type, generate]);
 
   return password;
 };
