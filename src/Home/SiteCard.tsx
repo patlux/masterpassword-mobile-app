@@ -9,7 +9,7 @@ import {
 import { Card, CardProps, Badge } from 'react-native-paper';
 
 import { ISite } from '../Site/SitesContext';
-import { useMPWPassword } from '../Auth/AuthContext';
+import useMPWPassword from '../MasterPassword/usePassword';
 import PasswordText from '../components/PasswordText';
 import { Ionicons } from '@expo/vector-icons';
 

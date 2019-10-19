@@ -2,7 +2,6 @@ import React, { ReactNode } from 'react';
 import { AppLoading } from 'expo';
 import * as SecureStore from 'expo-secure-store';
 
-import MPW from '../Utils/mpw/mpw';
 import AuthContext, { IAuthUser } from './AuthContext';
 
 export interface Props {
@@ -13,19 +12,8 @@ function AuthProvider({ children }: Props) {
   const [isReady, setIsReady] = React.useState(false);
   const [user, setUser] = React.useState<IAuthUser>(null);
 
-  const mpwRef = React.useRef<MPW>();
   React.useEffect(() => {
-    console.log('user changed:', user);
-    if (user && user.name && user.password) {
-      console.log('calculate with mpw ...');
-      const start = new Date().getTime();
-      mpwRef.current = new MPW(user.name, user.password);
-      const end = new Date().getTime();
-      console.log('calculation finished in:', end - start);
-    }
-  }, [user]);
-
-  React.useEffect(() => {
+    console.log('AuthProvider', 'Loading name, password ...');
     Promise.all([
       SecureStore.getItemAsync('name'),
       SecureStore.getItemAsync('password'),
@@ -64,7 +52,6 @@ function AuthProvider({ children }: Props) {
         password: user && user.password,
         login,
         logout,
-        mpwRef,
       }}
     >
       {children}

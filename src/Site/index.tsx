@@ -17,7 +17,7 @@ import {
 } from 'react-navigation-header-buttons';
 import { Ionicons } from '@expo/vector-icons';
 
-import { useMPWPassword } from '../Auth/AuthContext';
+import useMPWPassword from '../MasterPassword/usePassword';
 import ScreenHeader from '../components/ScreenHeader';
 import DialogPasswordType from '../components/DialogPasswordType';
 import { NavigationInjectedProps } from 'react-navigation';
