@@ -59,7 +59,7 @@ function LoginScreen({ style, ...viewProps }: KeyboardAvoidingViewProps) {
 
   return (
     <KeyboardAvoidingView
-      style={[style, { flex: 1 }]}
+      style={[style, { flex: 1, backgroundColor: '#fff' }]}
       behavior="padding"
       enabled
       {...viewProps}
