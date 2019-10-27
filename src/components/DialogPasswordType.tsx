@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Dialog, List, DialogProps } from 'react-native-paper';
 
-import MPW from '../Utils/mpw/mpw';
+import { templates } from '../Utils/mpw/templates';
 import { ScrollView } from 'react-native';
 
 export interface Props {
@@ -27,7 +27,7 @@ function DialogPasswordType({
       <Dialog.ScrollArea>
         <ScrollView>
           <List.Section>
-            {Object.keys(MPW.templates).map(passwordTypeKey => (
+            {Object.keys(templates).map(passwordTypeKey => (
               <List.Item
                 key={passwordTypeKey}
                 title={passwordTypeKey}

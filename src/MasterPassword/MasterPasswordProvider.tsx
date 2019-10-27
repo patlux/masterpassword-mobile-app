@@ -1,35 +1,34 @@
 import React, { ReactNode } from 'react';
 
-import MPW from '../Utils/mpw/mpw';
 import { useAuth } from '../Auth/AuthContext';
 import MasterPasswordContext from './MasterPasswordContext';
+import MpwWebView from './MpwWebView/MpwWebView';
 
 export interface Props {
   children: ReactNode;
 }
 
 function MasterPasswordProvider({ children }: Props) {
-  const mpwRef = React.useRef<MPW>();
   const { name, password } = useAuth();
+  const mpwWebViewRef = React.useRef<MpwWebView>();
 
-  React.useEffect(() => {
-    console.log('MasterPasswordProvider', 'useEffect() ...', {
-      name,
-      password,
-    });
-    if (name && password) {
-      console.log('calculate with mpw ...');
-      const start = new Date().getTime();
-      mpwRef.current = new MPW(name, password);
-      const end = new Date().getTime();
-      console.log('calculation finished in:', end - start);
-    }
-  }, [name, password]);
+  async function generatePassword(
+    site: string,
+    counter: number,
+    template: string = 'long',
+  ): Promise<string> {
+    return await mpwWebViewRef.current.generatePassword(
+      site,
+      counter,
+      template,
+    );
+  }
 
   console.log('MasterPasswordProvider', 'render()', { name, password });
 
   return (
-    <MasterPasswordContext.Provider value={{ mpwRef }}>
+    <MasterPasswordContext.Provider value={{ generatePassword }}>
+      <MpwWebView ref={mpwWebViewRef} name={name} password={password} />
       {children}
     </MasterPasswordContext.Provider>
   );

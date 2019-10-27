@@ -5,12 +5,12 @@ import { useAuth } from './Auth/AuthContext';
 import AuthenticatedApp from './AuthenticatedApp';
 import LoginScreen from './Auth/Login';
 
-function Index() {
+function Index(props) {
   const { name, password } = useAuth();
   return name && password ? (
-    <AuthenticatedApp {...getPersistenceFunctions()} />
+    <AuthenticatedApp {...getPersistenceFunctions()} {...props} />
   ) : (
-    <LoginScreen />
+    <LoginScreen {...props} />
   );
 }
 

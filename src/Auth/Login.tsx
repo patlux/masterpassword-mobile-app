@@ -1,12 +1,17 @@
 import React from 'react';
-import { View, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
+import {
+  View,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  KeyboardAvoidingViewProps,
+} from 'react-native';
 import { TextInput, Button, Checkbox, Text } from 'react-native-paper';
 import * as SecureStore from 'expo-secure-store';
 
 import AuthContext from '../Auth/AuthContext';
 import ScreenHeader from '../components/ScreenHeader';
 
-function LoginScreen() {
+function LoginScreen({ style, ...viewProps }: KeyboardAvoidingViewProps) {
   const { name, password, login } = React.useContext(AuthContext);
   const [loading, setLoading] = React.useState(false);
   const [formValues, setFormValues] = React.useState({
@@ -53,7 +58,12 @@ function LoginScreen() {
   }
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding" enabled>
+    <KeyboardAvoidingView
+      style={[style, { flex: 1 }]}
+      behavior="padding"
+      enabled
+      {...viewProps}
+    >
       <ScreenHeader>Login</ScreenHeader>
       <View style={{ flex: 1, paddingHorizontal: '10%' }}>
         <TextInput

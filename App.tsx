@@ -1,4 +1,3 @@
-import '@expo/browser-polyfill';
 import React from 'react';
 import { StatusBar } from 'react-native';
 
