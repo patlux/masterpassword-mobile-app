@@ -12,6 +12,6 @@ jobs:
         with:
           node-version: '10.x'
       - run: yarn install
-      - run: yarn global install expo-cli@latest
+      - run: yarn global add expo-cli@latest
       - run: expo login --non-interactive -u ${{ secrets.EXPO_CLI_USERNAME }} -p ${{ secrets.EXPO_CLI_PASSWORD }}
       - run: expo publish --non-interactive
