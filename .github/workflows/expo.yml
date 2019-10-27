@@ -12,7 +12,7 @@ jobs:
         with:
           node-version: '10.x'
       - run: yarn install
-      - run: yarn global add expo-cli@latest
+      - run: npm install --unsafe-perm=true -g expo-cli@latest
       - run: expo-cli login --non-interactive -u ${{ secrets.EXPO_CLI_USERNAME }}
         env:
           EXPO_CLI_PASSWORD: ${{ secrets.EXPO_CLI_PASSWORD }}
