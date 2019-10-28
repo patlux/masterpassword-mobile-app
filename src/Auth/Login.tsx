@@ -89,6 +89,7 @@ function LoginScreen({ style, ...viewProps }: KeyboardAvoidingViewProps) {
           autoCompleteType="password"
           autoCorrect={false}
           textContentType="password"
+          autoCapitalize="none"
           disabled={loading}
         />
         <TouchableOpacity
