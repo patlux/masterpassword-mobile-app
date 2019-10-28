@@ -6,7 +6,7 @@ import {
   Clipboard,
   Alert,
 } from 'react-native';
-import { Card, CardProps, Badge } from 'react-native-paper';
+import { Card } from 'react-native-paper';
 
 import { ISite } from '../Site/SitesContext';
 import useMPWPassword from '../MasterPassword/usePassword';
@@ -21,7 +21,7 @@ function SiteCard({
   site,
   style,
   ...cardProps
-}: Props & Omit<CardProps, 'children'>) {
+}: Props & React.ComponentProps<typeof Card>) {
   const [showPassword, setShowPassword] = React.useState(false);
   const password = useMPWPassword(site, showPassword);
 

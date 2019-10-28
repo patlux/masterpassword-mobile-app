@@ -1,12 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, Clipboard, Alert } from 'react-native';
-import {
-  TextInput,
-  Portal,
-  withTheme,
-  Theme,
-  Button,
-} from 'react-native-paper';
+import { TextInput, Portal, Button, useTheme } from 'react-native-paper';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useSafeArea } from 'react-native-safe-area-context';
 import {
@@ -28,11 +22,7 @@ const isValidNumber = (numStr: any): boolean => {
   return !isNaN(numStr);
 };
 
-export interface Props {
-  theme: Theme;
-}
-
-function SiteScreen({ theme, navigation }: Props & NavigationInjectedProps) {
+function SiteScreen({ navigation }: NavigationInjectedProps) {
   const { sites, addSite, updateSite, removeSite } = useSites();
   const insets = useSafeArea();
   const [visibleDialog, setVisibleDialog] = React.useState(null);
@@ -129,6 +119,8 @@ function SiteScreen({ theme, navigation }: Props & NavigationInjectedProps) {
   React.useEffect(() => {
     navigation.setParams({ delete: deleteSite });
   }, [deleteSite]);
+
+  const theme = useTheme();
 
   return (
     <View style={{ flex: 1 }}>
@@ -264,9 +256,7 @@ SiteScreen.navigationOptions = ({ navigation }) => {
   };
 };
 
-const SiteScreenExtended = withTheme(SiteScreen);
-
-export default SiteScreenExtended;
+export default SiteScreen;
 
 const styles = StyleSheet.create({
   container: {},

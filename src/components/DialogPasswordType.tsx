@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Dialog, List, DialogProps } from 'react-native-paper';
+import { Button, Dialog, List } from 'react-native-paper';
 
 import { templates } from '../Utils/mpw/templates';
 import { ScrollView } from 'react-native';
@@ -11,7 +11,7 @@ export interface Props {
 function DialogPasswordType({
   onDone,
   ...props
-}: Props & Omit<DialogProps, 'children'>) {
+}: Props & React.ComponentProps<typeof Dialog>) {
   function onSelected(passwordType: string) {
     return () => {
       if (!onDone) {
