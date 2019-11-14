@@ -43,8 +43,10 @@
     "@types/react-native": "0.60.15",
     "babel-plugin-macros": "2.6.1",
     "babel-preset-expo": "7.0.0",
+    "husky": "3.0.9",
     "jest": "24.9.0",
     "jest-expo": "35.0.0",
+    "lint-staged": "9.4.3",
     "prettier": "1.19.1",
     "typescript": "3.6.3"
   },
@@ -53,6 +55,27 @@
     "preset": "jest-expo",
     "transformIgnorePatterns": [
       "node_modules/(?!(jest-)?react-native|react-clone-referenced-element|@react-native-community|expo(nent)?|@expo(nent)?/.*|react-navigation|@react-navigation/.*|@unimodules/.*|sentry-expo|native-base)"
+    ]
+  },
+  "prettier": {
+    "semi": true,
+    "tabWidth": 2,
+    "useTabs": false,
+    "printWidth": 100,
+    "singleQuote": true,
+    "trailingComma": "es5",
+    "bracketSpacing": true,
+    "requirePragma": false
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{ts,tsx,json}": [
+      "prettier --write",
+      "git add"
     ]
   }
 }
