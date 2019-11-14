@@ -21,9 +21,7 @@ function SiteList({ onPressSite }: Props) {
     <FlatList
       keyExtractor={site => site.name}
       data={sites}
-      renderItem={({ item: site }) => (
-        <SiteCard site={site} onPress={() => onPressCard(site)} />
-      )}
+      renderItem={({ item: site }) => <SiteCard site={site} onPress={() => onPressCard(site)} />}
     />
   );
 }

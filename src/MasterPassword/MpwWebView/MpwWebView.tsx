@@ -70,7 +70,7 @@ const runGeneratePassword = (
   messageId: string,
   site: string,
   counter: string,
-  template: string = 'long',
+  template: string = 'long'
 ) => `
   window.mpwInstance.generatePassword("${site}", "${counter}", "${template}")
     .then(function (password) {
@@ -121,9 +121,7 @@ class MpwWebView extends React.PureComponent<Props & ViewProps, State> {
       this.initMpw(name, password);
     } else if (name !== prevProps.name || password !== prevProps.password) {
       if (this.state.isInitialized) {
-        this.setState({ isInitialized: false }, () =>
-          this.initMpw(name, password),
-        );
+        this.setState({ isInitialized: false }, () => this.initMpw(name, password));
       } else {
         this.initMpw(name, password);
       }
@@ -158,18 +156,14 @@ class MpwWebView extends React.PureComponent<Props & ViewProps, State> {
     }
   };
 
-  generatePassword = (
-    site: string,
-    counter: number,
-    template: string = 'long',
-  ): Promise<string> =>
+  generatePassword = (site: string, counter: number, template: string = 'long'): Promise<string> =>
     new Promise((resolve, reject) => {
       const messageId = Math.random()
         .toString(36)
         .substr(2, 12);
 
       this.webViewRef.current.injectJavaScript(
-        runGeneratePassword(messageId, site, '' + counter, template),
+        runGeneratePassword(messageId, site, '' + counter, template)
       );
 
       let timeoutId = setTimeout(() => {
@@ -218,12 +212,7 @@ class MpwWebView extends React.PureComponent<Props & ViewProps, State> {
 }
 
 function Hide({ style, ...restProps }: { children: ReactNode } & ViewProps) {
-  return (
-    <View
-      {...restProps}
-      style={[{ height: 0, width: 0, overflow: 'hidden' }, style]}
-    />
-  );
+  return <View {...restProps} style={[{ height: 0, width: 0, overflow: 'hidden' }, style]} />;
 }
 
 export default MpwWebView;

@@ -4,10 +4,7 @@ export const navigationPersistenceKey = 'navigationState';
 
 export const persistNavigationState = async navState => {
   try {
-    return await AsyncStorage.setItem(
-      navigationPersistenceKey,
-      JSON.stringify(navState),
-    );
+    return await AsyncStorage.setItem(navigationPersistenceKey, JSON.stringify(navState));
   } catch (err) {
     if (__DEV__) {
       console.error('Error white peristing navigation state:', err);

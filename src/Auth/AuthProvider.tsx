@@ -14,19 +14,13 @@ function AuthProvider({ children }: Props) {
 
   React.useEffect(() => {
     console.log('AuthProvider', 'Loading name, password ...');
-    Promise.all([
-      SecureStore.getItemAsync('name'),
-      SecureStore.getItemAsync('password'),
-    ])
+    Promise.all([SecureStore.getItemAsync('name'), SecureStore.getItemAsync('password')])
       .then(([name, password]) => {
         setUser(user => ({ ...user, name, password }));
         setIsReady(true);
       })
       .catch(error => {
-        console.error(
-          "Error white loading 'name'/'password' from storage:",
-          error,
-        );
+        console.error("Error white loading 'name'/'password' from storage:", error);
         setIsReady(true);
       });
   }, []);

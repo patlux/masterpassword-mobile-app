@@ -34,9 +34,7 @@ function SitesProvider({ children }: Props) {
   function addSite(site: ISite) {
     console.log('addSite', site);
     setSites(prevSites => {
-      const index = prevSites.findIndex(
-        itemSite => itemSite.name === site.name,
-      );
+      const index = prevSites.findIndex(itemSite => itemSite.name === site.name);
 
       if (index === -1) {
         return Array.isArray(prevSites) ? [...prevSites, site] : [site];
@@ -49,9 +47,7 @@ function SitesProvider({ children }: Props) {
   function updateSite(prevSite: ISite, newSite: ISite) {
     console.log('updateSite', { prevSite, newSite });
     setSites(prevSites => {
-      const prevSiteIndex = prevSites.findIndex(
-        itemSite => itemSite.name === prevSite.name,
-      );
+      const prevSiteIndex = prevSites.findIndex(itemSite => itemSite.name === prevSite.name);
 
       if (prevSiteIndex === -1) {
         return prevSites;
@@ -67,9 +63,7 @@ function SitesProvider({ children }: Props) {
       if (!Array.isArray(prevSites)) {
         return prevSites;
       }
-      const indexToRemove = prevSites.findIndex(
-        itemSite => itemSite.name === site.name,
-      );
+      const indexToRemove = prevSites.findIndex(itemSite => itemSite.name === site.name);
       if (indexToRemove === -1) {
         return prevSites;
       }

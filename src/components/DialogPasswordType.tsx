@@ -8,10 +8,7 @@ export interface Props {
   onDone: (passwordType: string) => void;
 }
 
-function DialogPasswordType({
-  onDone,
-  ...props
-}: Props & React.ComponentProps<typeof Dialog>) {
+function DialogPasswordType({ onDone, ...props }: Props & React.ComponentProps<typeof Dialog>) {
   function onSelected(passwordType: string) {
     return () => {
       if (!onDone) {

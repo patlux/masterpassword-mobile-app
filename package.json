@@ -6,7 +6,8 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "eject": "expo eject",
-    "test": "jest"
+    "test": "jest",
+    "format": "prettier --write \"App.tsx\" \"src/**/*.{ts,tsx}\""
   },
   "dependencies": {
     "@expo/browser-polyfill": "0.1.0",
@@ -44,6 +45,7 @@
     "babel-preset-expo": "7.0.0",
     "jest": "24.9.0",
     "jest-expo": "35.0.0",
+    "prettier": "1.19.1",
     "typescript": "3.6.3"
   },
   "private": true,

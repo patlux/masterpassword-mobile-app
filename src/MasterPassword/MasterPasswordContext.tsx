@@ -1,11 +1,7 @@
 import React from 'react';
 
 export interface IMasterPasswordContext {
-  generatePassword: (
-    site: string,
-    counter: number,
-    template: string,
-  ) => Promise<string>;
+  generatePassword: (site: string, counter: number, template: string) => Promise<string>;
 }
 
 const MasterPasswordContext = React.createContext<IMasterPasswordContext>({

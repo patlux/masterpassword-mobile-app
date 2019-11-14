@@ -31,7 +31,7 @@ function SiteScreen({ navigation }: NavigationInjectedProps) {
       name: '',
       counter: '1',
       type: 'maximum',
-    },
+    }
   );
 
   const password = useMPWPassword({
@@ -170,20 +170,14 @@ function SiteScreen({ navigation }: NavigationInjectedProps) {
             mode="flat"
             label="Counter"
             value={'' + formValues.counter}
-            onChangeText={counter =>
-              setFormValues({ ...formValues, counter: counter })
-            }
+            onChangeText={counter => setFormValues({ ...formValues, counter: counter })}
             style={{ marginBottom: 10, flex: 1 }}
             autoFocus={false}
             selectTextOnFocus={true}
             multiline={false}
             keyboardType="number-pad"
           />
-          <Button
-            onPress={increaseCounter}
-            mode="contained"
-            style={{ marginLeft: 10 }}
-          >
+          <Button onPress={increaseCounter} mode="contained" style={{ marginLeft: 10 }}>
             +
           </Button>
         </View>
@@ -193,9 +187,7 @@ function SiteScreen({ navigation }: NavigationInjectedProps) {
         style={[
           styles.passwordContainer,
           {
-            backgroundColor: password
-              ? theme.colors.accent
-              : theme.colors.disabled,
+            backgroundColor: password ? theme.colors.accent : theme.colors.disabled,
           },
         ]}
         onPress={() => {
@@ -246,11 +238,7 @@ SiteScreen.navigationOptions = ({ navigation }) => {
           iconName={navigation.getParam('site') ? 'md-trash' : 'md-close'}
           onPress={navigation.getParam('delete')}
         />
-        <Item
-          title="Save"
-          iconName="md-checkmark"
-          onPress={navigation.getParam('submit')}
-        />
+        <Item title="Save" iconName="md-checkmark" onPress={navigation.getParam('submit')} />
       </HeaderButtons>
     ),
   };

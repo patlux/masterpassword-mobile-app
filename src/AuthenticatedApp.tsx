@@ -17,7 +17,7 @@ const AppStack = createStackNavigator(
         top: 'never',
       },
     },
-  },
+  }
 );
 
 export default createAppContainer(AppStack);

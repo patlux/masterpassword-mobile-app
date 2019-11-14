@@ -4,21 +4,15 @@ import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
 import { Button, Paragraph } from 'react-native-paper';
 
-import {
-  parse,
-  IMpwAppCliConfigFile,
-  IMpwAppCliConfigSite,
-} from '../Utils/Import';
+import { parse, IMpwAppCliConfigFile, IMpwAppCliConfigSite } from '../Utils/Import';
 
 function ImportScreen() {
   const [file, setFile] = React.useState<DocumentPicker.DocumentResult>(null);
   const [content, setContent] = React.useState(null);
-  const [mpwCliConfig, setMpwCliConfig] = React.useState<IMpwAppCliConfigFile>(
-    null,
+  const [mpwCliConfig, setMpwCliConfig] = React.useState<IMpwAppCliConfigFile>(null);
+  const [sites, setSites] = React.useState<Array<IMpwAppCliConfigSite & { __siteName: string }>>(
+    []
   );
-  const [sites, setSites] = React.useState<
-    Array<IMpwAppCliConfigSite & { __siteName: string }>
-  >([]);
 
   async function onPress() {
     const result = await DocumentPicker.getDocumentAsync({
@@ -32,11 +26,9 @@ function ImportScreen() {
     if (!file) {
       return;
     }
-    FileSystem.readAsStringAsync(file.uri, { encoding: 'utf8' }).then(
-      result => {
-        setContent(result);
-      },
-    );
+    FileSystem.readAsStringAsync(file.uri, { encoding: 'utf8' }).then(result => {
+      setContent(result);
+    });
   }, [file]);
 
   React.useEffect(() => {
@@ -57,7 +49,7 @@ function ImportScreen() {
       Object.keys(mpwCliConfig.sites).map(siteName => ({
         __siteName: siteName,
         ...mpwCliConfig.sites[siteName],
-      })),
+      }))
     );
   }, [mpwCliConfig]);
 

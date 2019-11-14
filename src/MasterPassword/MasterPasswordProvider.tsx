@@ -15,13 +15,9 @@ function MasterPasswordProvider({ children }: Props) {
   async function generatePassword(
     site: string,
     counter: number,
-    template: string = 'long',
+    template: string = 'long'
   ): Promise<string> {
-    return await mpwWebViewRef.current.generatePassword(
-      site,
-      counter,
-      template,
-    );
+    return await mpwWebViewRef.current.generatePassword(site, counter, template);
   }
 
   console.log('MasterPasswordProvider', 'render()', { name, password });

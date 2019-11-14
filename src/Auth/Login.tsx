@@ -45,7 +45,7 @@ function LoginScreen({ style, ...viewProps }: KeyboardAvoidingViewProps) {
       }
       await SecureStore.setItemAsync(
         'rememberPassword',
-        formValues.rememberPassword ? 'yes' : 'no',
+        formValues.rememberPassword ? 'yes' : 'no'
       );
       setLoading(false);
       login({ name: formValues.name, password: formValues.password });

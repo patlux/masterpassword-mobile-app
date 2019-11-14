@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  StyleSheet,
-  TouchableHighlight,
-  View,
-  Clipboard,
-  Alert,
-} from 'react-native';
+import { StyleSheet, TouchableHighlight, View, Clipboard, Alert } from 'react-native';
 import { Card } from 'react-native-paper';
 
 import { ISite } from '../Site/SitesContext';
@@ -17,11 +11,7 @@ export interface Props {
   site: ISite;
 }
 
-function SiteCard({
-  site,
-  style,
-  ...cardProps
-}: Props & React.ComponentProps<typeof Card>) {
+function SiteCard({ site, style, ...cardProps }: Props & React.ComponentProps<typeof Card>) {
   const [showPassword, setShowPassword] = React.useState(false);
   const password = useMPWPassword(site, showPassword);
 
@@ -45,12 +35,7 @@ function SiteCard({
             <PasswordText style={styles.passwordText}>
               {showPassword ? password : '********'}
             </PasswordText>
-            <Ionicons
-              size={18}
-              color="#000"
-              name="md-copy"
-              style={{ alignSelf: 'center' }}
-            />
+            <Ionicons size={18} color="#000" name="md-copy" style={{ alignSelf: 'center' }} />
           </View>
         </TouchableHighlight>
       </Card.Content>

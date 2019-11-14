@@ -57,12 +57,7 @@ function HomeScreen({ navigation }: NavigationInjectedProps) {
       <FAB
         style={[styles.fab, { bottom: insets.bottom }]}
         icon={({ size, color }) => (
-          <Ionicons
-            size={size}
-            color={color}
-            name="md-add"
-            style={{ alignSelf: 'center' }}
-          />
+          <Ionicons size={size} color={color} name="md-add" style={{ alignSelf: 'center' }} />
         )}
         onPress={onPressFab}
       />

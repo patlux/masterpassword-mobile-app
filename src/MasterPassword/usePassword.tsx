@@ -10,7 +10,7 @@ export interface IUsePassword {
 
 export const usePassword = (
   { name, counter, type }: IUsePassword,
-  generate: boolean = true,
+  generate: boolean = true
 ): string => {
   const { generatePassword } = useMPW();
   const [password, setPassword] = React.useState<string>(null);
@@ -23,9 +23,7 @@ export const usePassword = (
       setPassword('');
       return;
     }
-    generatePassword(name, +counter, type).then(password =>
-      setPassword(password),
-    );
+    generatePassword(name, +counter, type).then(password => setPassword(password));
   }, [name, counter, type, generate]);
 
   return password;
