@@ -9,13 +9,16 @@ export interface ISite {
 
 export interface ISitesContext {
   sites: ISite[];
-  addSite?: (site: ISite) => void;
-  updateSite?: (prevSite: ISite, newSite: ISite) => void;
-  removeSite?: (site: ISite) => void;
+  addSite: (site: ISite) => void | Promise<void>;
+  updateSite: (prevSite: ISite, newSite: ISite) => void | Promise<void>;
+  removeSite: (site: ISite) => void | Promise<void>;
 }
 
 const SitesContext = React.createContext<ISitesContext>({
   sites: [],
+  addSite: () => Promise.reject('Not provided'),
+  updateSite: () => Promise.reject('Not provided'),
+  removeSite: () => Promise.reject('Not provided'),
 });
 
 export default SitesContext;

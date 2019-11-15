@@ -6,11 +6,14 @@ export interface IAuthUser {
 }
 
 export interface IAuthContext extends IAuthUser {
-  login?: (user: IAuthUser) => void;
-  logout?: () => void;
+  login: (user: IAuthUser) => void | Promise<void>;
+  logout: () => void | Promise<void>;
 }
 
-const AuthContext = React.createContext<IAuthContext>({});
+const AuthContext = React.createContext<IAuthContext>({
+  login: () => Promise.reject('Not provided'),
+  logout: () => Promise.reject('Not provided'),
+});
 
 export const useAuth = (): IAuthContext => {
   return React.useContext(AuthContext);
