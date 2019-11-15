@@ -6,6 +6,11 @@
     "moduleResolution": "node",
     "noEmit": true,
     "skipLibCheck": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true,
+    "removeComments": true,
+    "target": "es5",
+    "strict": true,
+    "importHelpers": true
   }
 }
