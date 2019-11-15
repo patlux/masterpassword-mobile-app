@@ -10,13 +10,15 @@ export interface Props {
 
 function AuthProvider({ children }: Props) {
   const [isReady, setIsReady] = React.useState(false);
-  const [user, setUser] = React.useState<IAuthUser>(null);
+  const [user, setUser] = React.useState<IAuthUser>();
 
   React.useEffect(() => {
     console.log('AuthProvider', 'Loading name, password ...');
     Promise.all([SecureStore.getItemAsync('name'), SecureStore.getItemAsync('password')])
       .then(([name, password]) => {
-        setUser(user => ({ ...user, name, password }));
+        if (name && password) {
+          setUser(user => ({ ...user, name, password }));
+        }
         setIsReady(true);
       })
       .catch(error => {
@@ -31,12 +33,12 @@ function AuthProvider({ children }: Props) {
     return <AppLoading autoHideSplash={true} />;
   }
 
-  function login(newUser) {
+  function login(newUser: IAuthUser) {
     setUser(newUser);
   }
 
   function logout() {
-    setUser(null);
+    setUser(undefined);
   }
 
   return (

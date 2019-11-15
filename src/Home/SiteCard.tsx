@@ -9,9 +9,17 @@ import { Ionicons } from '@expo/vector-icons';
 
 export interface Props {
   site: ISite;
+  onPress: (site: ISite) => void;
 }
 
-function SiteCard({ site, style, ...cardProps }: Props & React.ComponentProps<typeof Card>) {
+type CardProps = React.ComponentProps<typeof Card>;
+
+function SiteCard({
+  site,
+  onPress,
+  style,
+  ...cardProps
+}: Props & Omit<CardProps, 'children' | 'onPress'>) {
   const [showPassword, setShowPassword] = React.useState(false);
   const password = useMPWPassword(site, showPassword);
 
@@ -20,20 +28,27 @@ function SiteCard({ site, style, ...cardProps }: Props & React.ComponentProps<ty
   }
 
   React.useEffect(() => {
-    if (showPassword) {
+    if (password && showPassword) {
       Clipboard.setString(password);
       Alert.alert('Password copied');
     }
-  }, [showPassword]);
+  }, [password, showPassword]);
+
+  function onPressWithSite() {
+    if (!onPress) {
+      return;
+    }
+    onPress(site);
+  }
 
   return (
-    <Card {...cardProps} style={[styles.container, style]}>
+    <Card {...cardProps} onPress={onPressWithSite} style={[styles.container, style]}>
       <Card.Title title={site.name} />
       <Card.Content>
         <TouchableHighlight onPress={togglePasswordVisibility}>
           <View style={styles.password}>
             <PasswordText style={styles.passwordText}>
-              {showPassword ? password : '********'}
+              {password && showPassword ? password : '********'}
             </PasswordText>
             <Ionicons size={18} color="#000" name="md-copy" style={{ alignSelf: 'center' }} />
           </View>

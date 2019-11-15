@@ -1,0 +1,40 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>mpw</title>
+  </head>
+  <body>
+    <script>
+      window.mpwInstance = null;
+
+      function postJson(data) {
+        if (!window || !window.ReactNativeWebView || !window.ReactNativeWebView.postMessage) {
+          return;
+        }
+        window.ReactNativeWebView.postMessage(JSON.stringify(data));
+      }
+
+      function postError(error) {
+        postJson({
+          error: error && error.message,
+        });
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        postJson({ domContentLoaded: true, mpw: window.MPW });
+      });
+
+      window.onerror = function(message, source, lineno, colno, error) {
+        postJson({
+          error: error,
+          errorMessage: error && error.message,
+          message: message,
+          source: source,
+          lineno: lineno,
+          colno: colno,
+        });
+      };
+    </script>
+  </body>
+</html>

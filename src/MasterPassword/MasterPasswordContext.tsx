@@ -5,7 +5,7 @@ export interface IMasterPasswordContext {
 }
 
 const MasterPasswordContext = React.createContext<IMasterPasswordContext>({
-  generatePassword: null,
+  generatePassword: () => Promise.reject('Not provided'),
 });
 
 export const useMPW = (): IMasterPasswordContext => {

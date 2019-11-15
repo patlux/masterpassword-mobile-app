@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, TextProps } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 import HackText, { Props as HackTextProps } from './HackText';
 

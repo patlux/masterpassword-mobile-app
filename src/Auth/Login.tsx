@@ -48,6 +48,9 @@ function LoginScreen({ style, ...viewProps }: KeyboardAvoidingViewProps) {
         formValues.rememberPassword ? 'yes' : 'no'
       );
       setLoading(false);
+      if (!login) {
+        throw new Error('login function not defined');
+      }
       login({ name: formValues.name, password: formValues.password });
     } catch (exception) {
       if (__DEV__) {

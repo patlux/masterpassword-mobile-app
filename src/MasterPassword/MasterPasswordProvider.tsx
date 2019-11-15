@@ -10,13 +10,16 @@ export interface Props {
 
 function MasterPasswordProvider({ children }: Props) {
   const { name, password } = useAuth();
-  const mpwWebViewRef = React.useRef<MpwWebView>();
+  const mpwWebViewRef = React.useRef<MpwWebView>(null);
 
   async function generatePassword(
     site: string,
     counter: number,
     template: string = 'long'
   ): Promise<string> {
+    if (!mpwWebViewRef?.current) {
+      return Promise.reject('no instance of MpwWebView found');
+    }
     return await mpwWebViewRef.current.generatePassword(site, counter, template);
   }
 

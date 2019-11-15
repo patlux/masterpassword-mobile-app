@@ -1,15 +1,15 @@
 import React from 'react';
-import { View, StyleSheet, Alert } from 'react-native';
-import { NavigationInjectedProps } from 'react-navigation';
+import { View, StyleSheet } from 'react-native';
 import { Button, Paragraph, FAB } from 'react-native-paper';
 import { useSafeArea } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { NavigationStackScreenComponent } from 'react-navigation-stack';
 
 import AuthContext from '../Auth/AuthContext';
 import { useSites, ISite } from '../Site/SitesContext';
 import SiteList from './SiteList';
 
-function HomeScreen({ navigation }: NavigationInjectedProps) {
+const HomeScreen: NavigationStackScreenComponent = ({ navigation }) => {
   const { logout } = React.useContext(AuthContext);
   const { sites } = useSites();
   const insets = useSafeArea();
@@ -19,7 +19,9 @@ function HomeScreen({ navigation }: NavigationInjectedProps) {
   }
 
   const onPressLogout = React.useCallback(() => {
-    logout();
+    if (logout) {
+      logout();
+    }
     navigation.navigate('Auth');
   }, [logout]);
 
@@ -63,7 +65,7 @@ function HomeScreen({ navigation }: NavigationInjectedProps) {
       />
     </>
   );
-}
+};
 
 HomeScreen.navigationOptions = ({ navigation }) => {
   return {

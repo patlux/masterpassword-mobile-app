@@ -3,6 +3,7 @@ import { View, StyleSheet, Clipboard, Alert } from 'react-native';
 import { TextInput, Portal, Button, useTheme } from 'react-native-paper';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useSafeArea } from 'react-native-safe-area-context';
+import { NavigationStackScreenComponent } from 'react-navigation-stack';
 import {
   HeaderButtons,
   HeaderButton,
@@ -14,18 +15,27 @@ import { Ionicons } from '@expo/vector-icons';
 import useMPWPassword from '../MasterPassword/usePassword';
 import ScreenHeader from '../components/ScreenHeader';
 import DialogPasswordType from '../components/DialogPasswordType';
-import { NavigationInjectedProps } from 'react-navigation';
 import { useSites, ISite } from './SitesContext';
 import PasswordText from '../components/PasswordText';
+import { PasswordType } from '../Utils/mpw/templates';
 
 const isValidNumber = (numStr: any): boolean => {
   return !isNaN(numStr);
 };
 
-function SiteScreen({ navigation }: NavigationInjectedProps) {
+export interface NavParams {
+  site?: ISite;
+  exists?: boolean; // TODO: necessary?
+  submit?: () => void;
+  delete?: () => void;
+}
+
+type DialogOpenType = undefined | null | 'type';
+
+const SiteScreen: NavigationStackScreenComponent<NavParams> = ({ navigation }) => {
   const { sites, addSite, updateSite, removeSite } = useSites();
   const insets = useSafeArea();
-  const [visibleDialog, setVisibleDialog] = React.useState(null);
+  const [visibleDialog, setVisibleDialog] = React.useState<DialogOpenType>();
   const [formValues, setFormValues] = React.useState<ISite>(
     navigation.getParam('site') || {
       name: '',
@@ -45,14 +55,14 @@ function SiteScreen({ navigation }: NavigationInjectedProps) {
     if (!site) {
       return false;
     }
-    return sites.some(itemSite => itemSite.name === site.name);
+    return sites.some((itemSite: ISite) => itemSite.name === site.name);
   }, [sites, navigation.getParam('site')]);
 
   React.useEffect(() => {
     navigation.setParams({ exists });
   }, [exists]);
 
-  function toggleDialog(dialogType: string) {
+  function toggleDialog(dialogType: DialogOpenType) {
     return () => {
       if (visibleDialog === dialogType) {
         hideDialog();
@@ -66,7 +76,7 @@ function SiteScreen({ navigation }: NavigationInjectedProps) {
     setVisibleDialog(null);
   }
 
-  function setPasswordType(passwordType) {
+  function setPasswordType(passwordType: PasswordType) {
     setFormValues({ ...formValues, type: passwordType });
     hideDialog();
   }
@@ -97,9 +107,12 @@ function SiteScreen({ navigation }: NavigationInjectedProps) {
       return;
     }
 
-    if (exists) {
-      updateSite(navigation.getParam('site'), formValues);
-    } else {
+    if (updateSite && exists) {
+      const site = navigation.getParam('site');
+      if (site) {
+        updateSite(site, formValues);
+      }
+    } else if (addSite) {
       addSite(formValues);
     }
     navigation.navigate('Home');
@@ -110,7 +123,7 @@ function SiteScreen({ navigation }: NavigationInjectedProps) {
   }, [submit]);
 
   const deleteSite = React.useCallback(() => {
-    if (exists) {
+    if (removeSite && exists) {
       removeSite(formValues);
     }
     navigation.navigate('Home');
@@ -222,7 +235,7 @@ function SiteScreen({ navigation }: NavigationInjectedProps) {
       </Portal>
     </View>
   );
-}
+};
 
 const IoniconsHeaderButton = (headerButtonProps: HeaderButtonProps) => (
   <HeaderButton IconComponent={Ionicons} iconSize={23} {...headerButtonProps} />

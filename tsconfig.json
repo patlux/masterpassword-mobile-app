@@ -11,6 +11,8 @@
     "removeComments": true,
     "target": "es5",
     "strict": true,
-    "importHelpers": true
+    "importHelpers": true,
+    "noUnusedLocals": true,
+    "pretty": true
   }
 }

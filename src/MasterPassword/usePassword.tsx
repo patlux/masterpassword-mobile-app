@@ -11,16 +11,16 @@ export interface IUsePassword {
 export const usePassword = (
   { name, counter, type }: IUsePassword,
   generate: boolean = true
-): string => {
+): undefined | string => {
   const { generatePassword } = useMPW();
-  const [password, setPassword] = React.useState<string>(null);
+  const [password, setPassword] = React.useState<undefined | string>();
 
   React.useEffect(() => {
     if (!generate) {
       return;
     }
     if (!name || name.trim().length === 0) {
-      setPassword('');
+      setPassword(undefined);
       return;
     }
     generatePassword(name, +counter, type).then(password => setPassword(password));

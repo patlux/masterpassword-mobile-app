@@ -1,23 +1,18 @@
 import React from 'react';
 
 export interface IAuthUser {
-  name: string;
-  password: string;
+  name?: string;
+  password?: string;
 }
 
 export interface IAuthContext extends IAuthUser {
-  login: (user: IAuthUser) => void;
-  logout: () => void;
+  login?: (user: IAuthUser) => void;
+  logout?: () => void;
 }
 
-const AuthContext = React.createContext<IAuthContext>({
-  name: null,
-  password: null,
-  login: (user: IAuthUser) => {},
-  logout: () => {},
-});
+const AuthContext = React.createContext<IAuthContext>({});
 
-export const useAuth = (): IAuthUser => {
+export const useAuth = (): IAuthContext => {
   return React.useContext(AuthContext);
 };
 

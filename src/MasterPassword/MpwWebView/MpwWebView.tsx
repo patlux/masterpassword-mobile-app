@@ -1,57 +1,11 @@
 import React, { ReactNode } from 'react';
 import { View, ViewProps } from 'react-native';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
-import raw from 'raw.macro';
 
-const createHtml = () => `
-<html>
-  <head>
-    <title>mpw</title>
-  </head>
-  <body>
-
-    <script>
-      window.mpwInstance = null;
-
-      function postJson(data) {
-        if (!window || !window.ReactNativeWebView || !window.ReactNativeWebView.postMessage) {
-          return;
-        }
-        window.ReactNativeWebView.postMessage(JSON.stringify(data))
-      }
-
-      function postError(error) {
-        postJson({
-          error: error && error.message
-        });
-      }
-
-      document.addEventListener("DOMContentLoaded", () => {
-        postJson({ domContentLoaded: true, mpw: window.MPW })
-      });
-
-      window.onerror = function(message, source, lineno, colno, error) {
-        postJson({ error: error, errorMessage: error && error.message, message: message, source: source, lineno: lineno, colno: colno })
-      }
-    </script>
-    <script>
-      ${raw('./js/typedarray-polyfill.js')}
-      ${raw('./js/encoding-polyfill.js')}
-    </script>
-    <script>
-      ${raw('./js/hmac-sha256.js')}
-      ${raw('./js/crypto-pbkdf2.js')}
-      ${raw('./js/lib-typedarrays-min.js')}
-    </script>
-    <script>
-      ${raw('./js/setImmediate-polyfill.js')}
-      ${raw('./js/pbkdf2.js')}
-      ${raw('./js/scrypt.js')}
-      ${raw('./js/mpw.js')}
-    </script>
-  </body>
-</html>
-`;
+const createHtml = (): string => {
+  const indexHtml = require('./index.html.ts');
+  return indexHtml.default();
+};
 
 const runInitMpw = (name: string, password: string) => `
   try {
@@ -80,8 +34,8 @@ const runGeneratePassword = (
 `;
 
 export interface Props {
-  name: string;
-  password: string;
+  name?: string;
+  password?: string;
 }
 
 export interface State {
@@ -89,16 +43,16 @@ export interface State {
   isInitialized: boolean;
 }
 
+export interface BridgeMessage {
+  successCallback: (data: any) => void;
+  errorCallback: (error: Error) => void;
+}
+
 class MpwWebView extends React.PureComponent<Props & ViewProps, State> {
   webViewRef: React.RefObject<WebView>;
-  callbacks: {
-    [key: string]: {
-      successCallback: (data: any) => void;
-      errorCallback: (error: Error) => void;
-    };
-  } = {};
+  callbacks: Map<string, BridgeMessage> = new Map();
 
-  constructor(props) {
+  constructor(props: Props & ViewProps) {
     super(props);
     this.state = {
       isReady: false,
@@ -109,8 +63,14 @@ class MpwWebView extends React.PureComponent<Props & ViewProps, State> {
 
   componentDidMount() {
     const { name, password } = this.props;
-    if (name && password) {
+    if (this.webViewRef?.current && name && password) {
       this.webViewRef.current.injectJavaScript(runInitMpw(name, password));
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.callbacks) {
+      this.callbacks.clear();
     }
   }
 
@@ -119,7 +79,7 @@ class MpwWebView extends React.PureComponent<Props & ViewProps, State> {
     const { isReady } = this.state;
     if (prevState.isReady === false && isReady === true && name && password) {
       this.initMpw(name, password);
-    } else if (name !== prevProps.name || password !== prevProps.password) {
+    } else if (name && password && (name !== prevProps.name || password !== prevProps.password)) {
       if (this.state.isInitialized) {
         this.setState({ isInitialized: false }, () => this.initMpw(name, password));
       } else {
@@ -128,7 +88,10 @@ class MpwWebView extends React.PureComponent<Props & ViewProps, State> {
     }
   }
 
-  initMpw = (name, password) => {
+  initMpw = (name: string, password: string) => {
+    if (!this.webViewRef.current) {
+      throw new Error('this.webViewRef is not defined');
+    }
     this.webViewRef.current.injectJavaScript(runInitMpw(name, password));
   };
 
@@ -142,8 +105,14 @@ class MpwWebView extends React.PureComponent<Props & ViewProps, State> {
       console.log('Error while parsing data:', data + '');
     }
     const { messageId, error, ...restData } = parsedData;
-    if (messageId && this.callbacks[messageId]) {
-      const callback = this.callbacks[messageId];
+    if (messageId) {
+      const callback = this.callbacks.get(messageId);
+      if (!callback) {
+        if (__DEV__) {
+          console.warn('Received a bridge message which was not found in the queue', messageId);
+        }
+        return;
+      }
       if (error) {
         callback.errorCallback(error);
       } else {
@@ -162,28 +131,32 @@ class MpwWebView extends React.PureComponent<Props & ViewProps, State> {
         .toString(36)
         .substr(2, 12);
 
+      if (!this.webViewRef.current) {
+        throw new Error('this.webViewRef is not defined');
+      }
+
       this.webViewRef.current.injectJavaScript(
         runGeneratePassword(messageId, site, '' + counter, template)
       );
 
-      let timeoutId = setTimeout(() => {
+      let timeoutId = window.setTimeout(() => {
+        this.callbacks.delete(messageId);
         reject(new Error('Timeout: Callback takes to much time to respond'));
-        this.callbacks[messageId] = null;
-      }, 30000);
+      }, 5000);
 
       const successCallback = (data: any) => {
+        this.callbacks.delete(messageId);
         clearTimeout(timeoutId);
         resolve(data.password as string);
-        this.callbacks[messageId] = null;
       };
 
-      function errorCallback(error: Error) {
+      const errorCallback = (error: Error) => {
+        this.callbacks.delete(messageId);
         clearTimeout(timeoutId);
         reject(error);
-        this.callbacks[messageId] = null;
-      }
+      };
 
-      this.callbacks[messageId] = { successCallback, errorCallback };
+      this.callbacks.set(messageId, { successCallback, errorCallback });
     });
 
   render() {

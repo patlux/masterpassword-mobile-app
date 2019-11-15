@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlatList } from 'react-native';
+import { FlatList, ListRenderItemInfo } from 'react-native';
 
 import { useSites, ISite } from '../Site/SitesContext';
 import SiteCard from './SiteCard';
@@ -12,18 +12,21 @@ function SiteList({ onPressSite }: Props) {
   const { sites } = useSites();
 
   function onPressCard(site: ISite) {
-    if (onPressSite) {
-      onPressSite(site);
+    if (!onPressSite) {
+      return;
     }
+    onPressSite(site);
   }
 
-  return (
-    <FlatList
-      keyExtractor={site => site.name}
-      data={sites}
-      renderItem={({ item: site }) => <SiteCard site={site} onPress={() => onPressCard(site)} />}
-    />
-  );
+  function renderItem({ item: site }: ListRenderItemInfo<ISite>) {
+    return <SiteCard site={site} onPress={onPressCard} />;
+  }
+
+  return <FlatList keyExtractor={keyExtractorForSite} data={sites} renderItem={renderItem} />;
+}
+
+function keyExtractorForSite(site: ISite): string {
+  return `site-${site.name}`;
 }
 
 export default SiteList;

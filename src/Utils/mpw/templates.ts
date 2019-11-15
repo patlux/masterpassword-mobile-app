@@ -1,11 +1,5 @@
-interface PasswordTemplate {
-  maximum: string[];
-  long: string[];
-  medium: string[];
-  basic: string[];
-  short: string[];
-  pin: string[];
-}
+export const PasswordTypes = ['maximum', 'long', 'medium', 'basic', 'short', 'pin'] as const;
+export type PasswordType = typeof PasswordTypes[number];
 
 interface PasswordCharacterTemplate {
   V: string;
@@ -19,7 +13,7 @@ interface PasswordCharacterTemplate {
   x: string;
 }
 
-export const templates: PasswordTemplate = {
+export const templates: Readonly<Record<PasswordType, string[]>> = {
   maximum: ['anoxxxxxxxxxxxxxxxxx', 'axxxxxxxxxxxxxxxxxno'],
   long: [
     'CvcvnoCvcvCvcv',
@@ -50,7 +44,7 @@ export const templates: PasswordTemplate = {
   pin: ['nnnn'],
 };
 
-export const templateChars: PasswordCharacterTemplate = {
+export const templateChars: Readonly<PasswordCharacterTemplate> = {
   V: 'AEIOU',
   C: 'BCDFGHJKLMNPQRSTVWXYZ',
   v: 'aeiou',
