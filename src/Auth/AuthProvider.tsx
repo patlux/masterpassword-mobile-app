@@ -42,8 +42,8 @@ function AuthProvider({ children }: Props) {
   return (
     <AuthContext.Provider
       value={{
-        name: user && user.name,
-        password: user && user.password,
+        name: user?.name,
+        password: user?.password,
         login,
         logout,
       }}

@@ -133,7 +133,7 @@ class MpwWebView extends React.PureComponent<Props & ViewProps, State> {
   };
 
   onMessage = (event: WebViewMessageEvent) => {
-    const data = event && event.nativeEvent && event.nativeEvent.data;
+    const data = event?.nativeEvent?.data;
     console.log('event:', typeof data, '' + data);
     let parsedData = null;
     try {
