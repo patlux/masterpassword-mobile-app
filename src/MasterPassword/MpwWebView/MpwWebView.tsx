@@ -12,7 +12,10 @@ const runInitMpw = (name: string, password: string) => `
     window.mpwInstance = new MPW("${name}", "${password}");
     window.mpwInstance.key
       .then(function (key) {
-        postJson({ key: key });
+        postJson({
+          key: key,
+          params: { name: "${name}", password: "${password}" }
+        });
       })
       .catch(postError);
   } catch (exception) {
@@ -28,7 +31,11 @@ const runGeneratePassword = (
 ) => `
   window.mpwInstance.generatePassword("${site}", "${counter}", "${template}")
     .then(function (password) {
-      postJson({ messageId: "${messageId}", password: password });
+      postJson({
+        messageId: "${messageId}",
+        password: password,
+        params: { site: "${site}", counter: "${counter}", template: "${template}" }
+      });
     })
     .catch(postError);
 `;
@@ -51,6 +58,7 @@ export interface BridgeMessage {
 class MpwWebView extends React.PureComponent<Props & ViewProps, State> {
   webViewRef: React.RefObject<WebView>;
   callbacks: Map<string, BridgeMessage> = new Map();
+  lastMessageIdByFunc: Map<string, string> = new Map();
 
   constructor(props: Props & ViewProps) {
     super(props);
@@ -71,6 +79,9 @@ class MpwWebView extends React.PureComponent<Props & ViewProps, State> {
   componentWillUnmount() {
     if (this.callbacks) {
       this.callbacks.clear();
+    }
+    if (this.lastMessageIdByFunc) {
+      this.lastMessageIdByFunc.clear();
     }
   }
 
@@ -108,9 +119,6 @@ class MpwWebView extends React.PureComponent<Props & ViewProps, State> {
     if (messageId) {
       const callback = this.callbacks.get(messageId);
       if (!callback) {
-        if (__DEV__) {
-          console.warn('Received a bridge message which was not found in the queue', messageId);
-        }
         return;
       }
       if (error) {
@@ -127,9 +135,17 @@ class MpwWebView extends React.PureComponent<Props & ViewProps, State> {
 
   generatePassword = (site: string, counter: number, template: string = 'long'): Promise<string> =>
     new Promise((resolve, reject) => {
+      const lastMessageId = this.lastMessageIdByFunc.get('generatePassword');
+      if (lastMessageId) {
+        this.callbacks.delete(lastMessageId);
+        this.lastMessageIdByFunc.delete('generatePassword');
+      }
+
       const messageId = Math.random()
         .toString(36)
         .substr(2, 12);
+
+      this.lastMessageIdByFunc.set('generatePassword', messageId);
 
       if (!this.webViewRef.current) {
         throw new Error('this.webViewRef is not defined');
@@ -140,18 +156,22 @@ class MpwWebView extends React.PureComponent<Props & ViewProps, State> {
       );
 
       let timeoutId = window.setTimeout(() => {
-        this.callbacks.delete(messageId);
-        reject(new Error('Timeout: Callback takes to much time to respond'));
+        const removed = this.callbacks.delete(messageId);
+        if (removed) {
+          reject(new Error('Timeout: Callback takes to much time to respond'));
+        }
       }, 5000);
 
       const successCallback = (data: any) => {
         this.callbacks.delete(messageId);
+        this.lastMessageIdByFunc.delete('generatePassword');
         clearTimeout(timeoutId);
         resolve(data.password as string);
       };
 
       const errorCallback = (error: Error) => {
         this.callbacks.delete(messageId);
+        this.lastMessageIdByFunc.delete('generatePassword');
         clearTimeout(timeoutId);
         reject(error);
       };
