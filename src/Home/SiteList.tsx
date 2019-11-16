@@ -1,16 +1,15 @@
 import React from 'react';
-import { FlatList, ListRenderItemInfo } from 'react-native';
+import { FlatList, ListRenderItemInfo, FlatListProps } from 'react-native';
 
-import { useSites, ISite } from '../Site/SitesContext';
+import { ISite } from '../Site/SitesContext';
 import SiteCard from './SiteCard';
 
-export interface Props {
+export interface Props<T> extends Omit<FlatListProps<T>, 'data' | 'keyExtractor' | 'renderItem'> {
+  sites: ISite[];
   onPressSite?: (site: ISite) => void;
 }
 
-function SiteList({ onPressSite }: Props) {
-  const { sites } = useSites();
-
+function SiteList<T>({ sites, onPressSite, ...listProps }: Props<T>) {
   function onPressCard(site: ISite) {
     if (!onPressSite) {
       return;
@@ -22,7 +21,14 @@ function SiteList({ onPressSite }: Props) {
     return <SiteCard site={site} onPress={onPressCard} />;
   }
 
-  return <FlatList keyExtractor={keyExtractorForSite} data={sites} renderItem={renderItem} />;
+  return (
+    <FlatList
+      {...(listProps as any)} // FIXME
+      keyExtractor={keyExtractorForSite}
+      data={sites}
+      renderItem={renderItem}
+    />
+  );
 }
 
 function keyExtractorForSite(site: ISite): string {
