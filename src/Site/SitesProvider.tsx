@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { AsyncStorage } from 'react-native';
+import { AsyncStorage, Text, View } from 'react-native';
 
 import SitesContext, { ISite } from './SitesContext';
 import { updateItem, removeItem } from '../Utils';
@@ -9,9 +9,9 @@ export interface Props {
 }
 
 function SitesProvider({ children }: Props) {
-  const [sites, setSites] = React.useState<ISite[]>([]);
+  const [sites, setSites] = React.useState<ISite[]>();
   React.useEffect(() => {
-    if (Array.isArray(sites) && sites.length > 0) {
+    if (Array.isArray(sites)) {
       AsyncStorage.setItem('sites', JSON.stringify(sites));
     }
   }, [sites]);
@@ -34,6 +34,9 @@ function SitesProvider({ children }: Props) {
   function addSite(site: ISite) {
     console.log('addSite', site);
     setSites(prevSites => {
+      if (!Array.isArray(prevSites)) {
+        return prevSites;
+      }
       const index = prevSites.findIndex(itemSite => itemSite.name === site.name);
 
       if (index === -1) {
@@ -47,6 +50,9 @@ function SitesProvider({ children }: Props) {
   function updateSite(prevSite: ISite, newSite: ISite) {
     console.log('updateSite', { prevSite, newSite });
     setSites(prevSites => {
+      if (!Array.isArray(prevSites)) {
+        return prevSites;
+      }
       const prevSiteIndex = prevSites.findIndex(itemSite => itemSite.name === prevSite.name);
 
       if (prevSiteIndex === -1) {
@@ -69,6 +75,14 @@ function SitesProvider({ children }: Props) {
       }
       return removeItem(prevSites, indexToRemove);
     });
+  }
+
+  if (!Array.isArray(sites)) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>Loading sites...</Text>
+      </View>
+    );
   }
 
   return (
