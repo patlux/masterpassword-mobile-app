@@ -2,82 +2,55 @@ import React, { ReactNode } from 'react';
 import { AsyncStorage, Text, View } from 'react-native';
 
 import SitesContext, { ISite } from './SitesContext';
-import { updateItem, removeItem } from '../Utils';
+import SitesReducer, { SitesInitialState } from './SitesReducer';
 
 export interface Props {
   children: ReactNode;
 }
 
 function SitesProvider({ children }: Props) {
-  const [sites, setSites] = React.useState<ISite[]>();
+  const [state, dispatch] = React.useReducer(SitesReducer, SitesInitialState);
+
   React.useEffect(() => {
-    if (Array.isArray(sites)) {
-      AsyncStorage.setItem('sites', JSON.stringify(sites));
+    if (Array.isArray(state.sites)) {
+      AsyncStorage.setItem('sites', JSON.stringify(state.sites));
     }
-  }, [sites]);
+  }, [state.sites]);
+
+  React.useEffect(() => {
+    dispatch({ type: 'LOADING_REQUEST' });
+  }, []);
 
   React.useEffect(() => {
     async function fetchSites() {
       try {
         const sitesJson = await AsyncStorage.getItem('sites');
-        if (sitesJson) {
-          setSites(JSON.parse(sitesJson));
-        }
+        const sites = sitesJson ? JSON.parse(sitesJson) : [];
+        dispatch({ type: 'LOADING_SUCCESS', payload: sites });
       } catch (exception) {
         console.error("Error white loading 'sites' from storage:", exception);
+        dispatch({ type: 'LOADING_FAILURE', error: exception });
       }
     }
 
-    fetchSites();
-  }, []);
+    if (state.status === 'loading') {
+      fetchSites();
+    }
+  }, [state.status]);
 
   function addSite(site: ISite) {
-    console.log('addSite', site);
-    setSites(prevSites => {
-      if (!Array.isArray(prevSites)) {
-        return prevSites;
-      }
-      const index = prevSites.findIndex(itemSite => itemSite.name === site.name);
-
-      if (index === -1) {
-        return Array.isArray(prevSites) ? [...prevSites, site] : [site];
-      }
-
-      return updateItem(prevSites, index, site);
-    });
+    dispatch({ type: 'SITE_ADD', site });
   }
 
   function updateSite(prevSite: ISite, newSite: ISite) {
-    console.log('updateSite', { prevSite, newSite });
-    setSites(prevSites => {
-      if (!Array.isArray(prevSites)) {
-        return prevSites;
-      }
-      const prevSiteIndex = prevSites.findIndex(itemSite => itemSite.name === prevSite.name);
-
-      if (prevSiteIndex === -1) {
-        return prevSites;
-      }
-
-      return updateItem(prevSites, prevSiteIndex, newSite);
-    });
+    dispatch({ type: 'SITE_UPDATE', site: prevSite, newSite });
   }
 
   function removeSite(site: ISite) {
-    console.log('removeSite', site);
-    setSites(prevSites => {
-      if (!Array.isArray(prevSites)) {
-        return prevSites;
-      }
-      const indexToRemove = prevSites.findIndex(itemSite => itemSite.name === site.name);
-      if (indexToRemove === -1) {
-        return prevSites;
-      }
-      return removeItem(prevSites, indexToRemove);
-    });
+    dispatch({ type: 'SITE_REMOVE', site });
   }
 
-  if (!Array.isArray(sites)) {
+  if (!Array.isArray(state.sites)) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Text>Loading sites...</Text>
@@ -86,7 +59,7 @@ function SitesProvider({ children }: Props) {
   }
 
   return (
-    <SitesContext.Provider value={{ sites, addSite, updateSite, removeSite }}>
+    <SitesContext.Provider value={{ sites: state.sites, addSite, updateSite, removeSite }}>
       {children}
     </SitesContext.Provider>
   );
