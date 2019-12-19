@@ -1,22 +1,27 @@
 name: Expo Publish CI
 
-on:
-  push:
-    branches:
-      - master
-
 jobs:
-  build:
+  validate:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
         with:
-          node-version: '10.x'
-      - run: yarn install
-      - run: npm install --unsafe-perm=true -g expo-cli@latest
-      - run: expo-cli login --non-interactive -u ${{ secrets.EXPO_CLI_USERNAME }}
+          node-version: 12
+      - run: npm ci
+      - run: npm run validate
+
+  build:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - run: npm ci
+      - run: npm install expo-cli@3
+      - run: npx expo login --non-interactive -u ${{ secrets.EXPO_CLI_USERNAME }}
         env:
           EXPO_CLI_PASSWORD: ${{ secrets.EXPO_CLI_PASSWORD }}
-      - run: expo-cli publish --non-interactive
+      - run: npx expo publish --non-interactive

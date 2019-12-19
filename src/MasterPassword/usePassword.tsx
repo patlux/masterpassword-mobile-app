@@ -10,7 +10,7 @@ export interface IUsePassword {
 
 export const usePassword = (
   { name, counter, type }: IUsePassword,
-  generate: boolean = true
+  generate = true
 ): undefined | string => {
   const { generatePassword } = useMPW();
   const [password, setPassword] = React.useState<undefined | string>();

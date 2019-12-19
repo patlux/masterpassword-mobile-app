@@ -1,4 +1,4 @@
-export const COLORS = <const>['RED', 'GREEN', 'YELLOW', 'BLUE', 'MAGENTA', 'CYAN', 'MONO'];
+export const COLORS = ['RED', 'GREEN', 'YELLOW', 'BLUE', 'MAGENTA', 'CYAN', 'MONO'];
 export type COLOR = typeof COLORS[number];
 
 export const leftArm = ['╔', '╚', '╰', '═'];

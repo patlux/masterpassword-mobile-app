@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { Headline } from 'react-native-paper';
 
 export interface Props {
-  children: any;
+  children?: React.ReactNode;
 }
 
 function ScreenHeader({ children }: Props) {

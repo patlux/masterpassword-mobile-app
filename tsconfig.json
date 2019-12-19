@@ -15,5 +15,6 @@
     "noUnusedLocals": true,
     "pretty": true,
     "downlevelIteration": true
-  }
+  },
+  "include": ["src/", "App.tsx", "*.config.js"]
 }

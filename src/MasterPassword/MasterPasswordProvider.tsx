@@ -15,7 +15,7 @@ function MasterPasswordProvider({ children }: Props) {
   async function generatePassword(
     site: string,
     counter: number,
-    template: string = 'long'
+    template = 'long'
   ): Promise<string> {
     if (!mpwWebViewRef?.current) {
       return Promise.reject('no instance of MpwWebView found');

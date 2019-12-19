@@ -1,7 +1,8 @@
 import { COLOR, COLORS, leftArm, body, rightArm, accessory } from './IdentIconConstants';
 
 function generate(fullName: string, password: string): [COLOR, string] {
-  var crypto = require('crypto');
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const crypto = require('crypto');
 
   const hex = crypto
     .createHmac('SHA256', password)

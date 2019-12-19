@@ -21,7 +21,7 @@ function Home(props: Props): JSX.Element {
   const renderEmptyList = () => {
     return (
       <View style={styles.emptyContainer}>
-        <Paragraph>It seems you didn't added sites yet.</Paragraph>
+        <Paragraph>{"It seems you didn't added sites yet."}</Paragraph>
         {props.onPressImportSites && (
           <Button onPress={props.onPressImportSites} mode="outlined" style={styles.emptyButton}>
             Import sites from file

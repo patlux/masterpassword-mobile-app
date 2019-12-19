@@ -3,6 +3,7 @@ import { View, ViewProps } from 'react-native';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 
 const createHtml = (): string => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const indexHtml = require('./index.html.ts');
   return indexHtml.default();
 };
@@ -27,7 +28,7 @@ const runGeneratePassword = (
   messageId: string,
   site: string,
   counter: string,
-  template: string = 'long'
+  template = 'long'
 ) => `
   window.mpwInstance.generatePassword("${site}", "${counter}", "${template}")
     .then(function (password) {
@@ -51,6 +52,7 @@ export interface State {
 }
 
 export interface BridgeMessage {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   successCallback: (data: any) => void;
   errorCallback: (error: Error) => void;
 }
@@ -133,7 +135,7 @@ class MpwWebView extends React.PureComponent<Props & ViewProps, State> {
     }
   };
 
-  generatePassword = (site: string, counter: number, template: string = 'long'): Promise<string> =>
+  generatePassword = (site: string, counter: number, template = 'long'): Promise<string> =>
     new Promise((resolve, reject) => {
       const lastMessageId = this.lastMessageIdByFunc.get('generatePassword');
       if (lastMessageId) {
@@ -155,13 +157,14 @@ class MpwWebView extends React.PureComponent<Props & ViewProps, State> {
         runGeneratePassword(messageId, site, '' + counter, template)
       );
 
-      let timeoutId = window.setTimeout(() => {
+      const timeoutId = window.setTimeout(() => {
         const removed = this.callbacks.delete(messageId);
         if (removed) {
           reject(new Error('Timeout: Callback takes to much time to respond'));
         }
       }, 5000);
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const successCallback = (data: any) => {
         this.callbacks.delete(messageId);
         this.lastMessageIdByFunc.delete('generatePassword');
@@ -180,6 +183,7 @@ class MpwWebView extends React.PureComponent<Props & ViewProps, State> {
     });
 
   render() {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { name, password, ...restProps } = this.props;
     return (
       <Hide {...restProps}>

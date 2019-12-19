@@ -3,6 +3,7 @@ import { NavigationState } from 'react-navigation';
 
 export const navigationPersistenceKey = 'navigationState';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const persistNavigationState = async (navState: NavigationState): Promise<any> => {
   try {
     return await AsyncStorage.setItem(navigationPersistenceKey, JSON.stringify(navState));

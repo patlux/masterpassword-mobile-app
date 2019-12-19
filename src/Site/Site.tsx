@@ -160,7 +160,6 @@ function Site({ site, onChange, isNew, password }: Props) {
 export default Site;
 
 const styles = StyleSheet.create({
-  container: {},
   passwordContainer: {
     width: '100%',
     paddingVertical: 10,
@@ -172,6 +171,7 @@ const styles = StyleSheet.create({
   },
 });
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function isValidNumber(numStr: any): boolean {
   return !isNaN(numStr);
 }

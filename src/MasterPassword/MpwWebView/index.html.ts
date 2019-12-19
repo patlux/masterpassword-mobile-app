@@ -10,19 +10,19 @@ export default () => {
 function getScriptDependencies(): string {
   return `
     <script>
-      ${raw('./js/typedarray-polyfill.js')}
-      ${raw('./js/encoding-polyfill.js')}
+      ${raw('../../../assets/mpw-js/typedarray-polyfill.js')}
+      ${raw('../../../assets/mpw-js/encoding-polyfill.js')}
     </script>
     <script>
-      ${raw('./js/hmac-sha256.js')}
-      ${raw('./js/crypto-pbkdf2.js')}
-      ${raw('./js/lib-typedarrays-min.js')}
+      ${raw('../../../assets/mpw-js/hmac-sha256.js')}
+      ${raw('../../../assets/mpw-js/crypto-pbkdf2.js')}
+      ${raw('../../../assets/mpw-js/lib-typedarrays-min.js')}
     </script>
     <script>
-      ${raw('./js/setImmediate-polyfill.js')}
-      ${raw('./js/pbkdf2.js')}
-      ${raw('./js/scrypt.js')}
-      ${raw('./js/mpw.js')}
+      ${raw('../../../assets/mpw-js/setImmediate-polyfill.js')}
+      ${raw('../../../assets/mpw-js/pbkdf2.js')}
+      ${raw('../../../assets/mpw-js/scrypt.js')}
+      ${raw('../../../assets/mpw-js/mpw.js')}
     </script>
   `;
 }
