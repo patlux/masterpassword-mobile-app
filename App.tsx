@@ -1,9 +1,12 @@
 import React from 'react';
 import { StatusBar, View, StyleSheet } from 'react-native';
+import { enableScreens } from 'react-native-screens';
 import Constants from 'expo-constants';
 
 import AppProviders from './src/AppProviders';
 import Root from './src';
+
+enableScreens();
 
 export default function App() {
   console.log('App', 'render()');
