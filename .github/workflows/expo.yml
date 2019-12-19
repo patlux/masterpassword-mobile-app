@@ -1,5 +1,10 @@
 name: Expo Publish CI
 
+on:
+  push:
+    branches:
+      - master
+
 jobs:
   validate:
     runs-on: ubuntu-latest
