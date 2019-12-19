@@ -10,30 +10,20 @@ export interface IUsePassword {
 
 export const usePassword = (
   { name, counter, type }: IUsePassword,
-  generate: boolean = true,
-): string => {
-  const { mpwRef } = useMPW();
-  const [password, setPassword] = React.useState<string>(null);
+  generate = true
+): undefined | string => {
+  const { generatePassword } = useMPW();
+  const [password, setPassword] = React.useState<undefined | string>();
 
   React.useEffect(() => {
     if (!generate) {
       return;
     }
-    if (!mpwRef.current) {
-      console.warn('mpwRef.current is not defined');
-    }
     if (!name || name.trim().length === 0) {
-      setPassword('');
+      setPassword(undefined);
       return;
     }
-    mpwRef.current
-      .generateAuthentication(
-        name,
-        +counter,
-        '', // context
-        type,
-      )
-      .then(password => setPassword(password));
+    generatePassword(name, +counter, type).then(password => setPassword(password));
   }, [name, counter, type, generate]);
 
   return password;

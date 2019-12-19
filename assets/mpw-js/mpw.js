@@ -3,9 +3,6 @@
 International License. To view a copy of this license, visit
 http://creativecommons.org/licenses/by/4.0/ or see LICENSE. */
 
-const scrypt = require('./scrypt').default;
-const CryptoJS = require('crypto-js');
-
 // JS Web Crypto implementation of http://masterpasswordapp.com/algorithm.html
 class MPW {
   constructor(name, password, version = MPW.VERSION) {
@@ -21,9 +18,7 @@ class MPW {
       // the password seed
       this.key = MPW.calculateKey(name, password, version);
     } else {
-      this.key = Promise.reject(
-        new Error(`Algorithm version ${version} not implemented`),
-      );
+      this.key = Promise.reject(new Error('Algorithm version ' + version + ' not implemented'));
     }
   }
 
@@ -53,11 +48,7 @@ class MPW {
 
       // Create salt array and a DataView representing it
       var salt = new Uint8Array(NS.length + 4 /*sizeof(uint32)*/ + name.length);
-      let saltView = new DataView(
-        salt.buffer,
-        salt.byteOffset,
-        salt.byteLength,
-      );
+      let saltView = new DataView(salt.buffer, salt.byteOffset, salt.byteLength);
       let i = 0;
 
       // Set salt[0,] to NS
@@ -83,17 +74,28 @@ class MPW {
 
     // Derive the master key w/ scrypt
     // why is buflen 64*8==512 and not 32*8==256 ?
-    let key = scrypt(
-      password,
-      salt,
-      32768 /*= n*/,
-      8 /*= r*/,
-      2 /*= p*/,
-      64 /*= buflen*/,
-    );
+    let key = window.scrypt(password, salt, 32768 /*= n*/, 8 /*= r*/, 2 /*= p*/, 64 /*= buflen*/);
 
     // If the Web Crypto API is supported import the key, otherwise return
-    return key;
+    return window.crypto.subtle
+      ? key.then(
+          // Import the key into WebCrypto to use later with sign while
+          // being non-extractable
+          key =>
+            window.crypto.subtle.importKey(
+              'raw',
+              key,
+              {
+                name: 'HMAC',
+                hash: {
+                  name: 'SHA-256',
+                },
+              },
+              false /*not extractable*/,
+              ['sign']
+            ) /*= key*/
+        )
+      : key;
   }
 
   // calculateSeed takes ~ 3.000ms to complete + the time of calculateKey once
@@ -128,13 +130,9 @@ class MPW {
         4 /*sizeof(uint32)*/ +
         site.length +
         4 /*sizeof(int32)*/ +
-          (context ? 4 /*sizeof(uint32)*/ + context.length : 0),
+          (context ? 4 /*sizeof(uint32)*/ + context.length : 0)
       );
-      let dataView = new DataView(
-        data.buffer,
-        data.byteOffset,
-        data.byteLength,
-      );
+      let dataView = new DataView(data.buffer, data.byteOffset, data.byteLength);
       let i = 0;
 
       // Set data[0,] to NS
@@ -172,38 +170,52 @@ class MPW {
       return Promise.reject(e);
     }
 
-    // Rely on crypto-js
-    return this.key
-      .then(function(key) {
-        // Create crypto-js WordArrays from Uint8Arrays data and key
-        data = CryptoJS.lib.WordArray.create(data);
-        key = CryptoJS.lib.WordArray.create(key);
-
-        // Sign data using HMAC-SHA-256 w/ key
-        return CryptoJS.HmacSHA256(data, key) /*= seed*/;
-      })
-      .then(function(hash) {
-        // Create seed array and a DataView representing it
-        let seed = new Uint8Array(hash.words.length * 4 /*sizeof(int32)*/);
-        let seedView = new DataView(
-          seed.buffer,
-          seed.byteOffset,
-          seed.byteLength,
+    // If the Web Crypto API is supported use it, otherwise rely on crypto-js
+    if (window.crypto.subtle) {
+      return this.key
+        .then(
+          // Sign data using HMAC-SHA-256 w/ this.key
+          key =>
+            window.crypto.subtle.sign(
+              {
+                name: 'HMAC',
+                hash: {
+                  name: 'SHA-256',
+                },
+              },
+              key,
+              data
+            ) /*= seed*/
+        )
+        .then(
+          // Convert the seed to Uint8Array from ArrayBuffer
+          seed => new Uint8Array(seed) /*= seed*/
         );
+    } else {
+      return this.key
+        .then(function(key) {
+          // Create crypto-js WordArrays from Uint8Arrays data and key
+          data = CryptoJS.lib.WordArray.create(data);
+          key = CryptoJS.lib.WordArray.create(key);
 
-        // Loop over hash.words which are INT32
-        for (let i = 0; i < hash.words.length; i++) {
-          // Set seed[i*4,i*4+4] to hash.words[i] INT32 in big-endian form
-          seedView.setInt32(
-            i * 4 /*sizeof(int32)*/,
-            hash.words[i],
-            false /*big-endian*/,
-          );
-        }
+          // Sign data using HMAC-SHA-256 w/ key
+          return CryptoJS.HmacSHA256(data, key) /*= seed*/;
+        })
+        .then(function(hash) {
+          // Create seed array and a DataView representing it
+          let seed = new Uint8Array(hash.words.length * 4 /*sizeof(int32)*/);
+          let seedView = new DataView(seed.buffer, seed.byteOffset, seed.byteLength);
 
-        // Return the seed Uint8Array
-        return seed;
-      });
+          // Loop over hash.words which are INT32
+          for (let i = 0; i < hash.words.length; i++) {
+            // Set seed[i*4,i*4+4] to hash.words[i] INT32 in big-endian form
+            seedView.setInt32(i * 4 /*sizeof(int32)*/, hash.words[i], false /*big-endian*/);
+          }
+
+          // Return the seed Uint8Array
+          return seed;
+        });
+    }
   }
 
   // generate takes ~ 0.200ms to complete + the time of calculateSeed
@@ -224,11 +236,10 @@ class MPW {
       // Java/masterpassword-algorithm/src/main/java/com/...
       // lyndir/masterpassword/MasterKeyV0.java#L105
       seed = seed.then(function(seedBytes) {
-        let seed = new Uint16Array(seedBytes.length);
+        var seed = new Uint16Array(seedBytes.length);
 
-        for (let i = 0; i < seed.length; i++) {
-          seed[i] =
-            (seedBytes[i] > 127 ? 0x00ff : 0x0000) | (seedBytes[i] << 8);
+        for (var i = 0; i < seed.length; i++) {
+          seed[i] = (seedBytes[i] > 127 ? 0x00ff : 0x0000) | (seedBytes[i] << 8);
         }
 
         return seed;
@@ -258,49 +269,16 @@ class MPW {
   }
 
   // generate a password with the password namespace
-  generateAuthentication(site, counter = 1, context = '', template = 'long') {
-    return this.generate(
-      site,
-      counter,
-      context,
-      template,
-      MPW.AuthenticationNS,
-    );
-  }
-
-  // generate a username with the login namespace
-  generateIdentification(site, counter = 1, context = '', template = 'name') {
-    return this.generate(
-      site,
-      counter,
-      context,
-      template,
-      MPW.IdentificationNS,
-    );
-  }
-
-  // generate a security answer with the answer namespace
-  generateRecovery(site, counter = 1, context = '', template = 'phrase') {
-    return this.generate(site, counter, context, template, MPW.RecoveryNS);
-  }
-
-  // generate a password with the password namespace
-  //
-  // Deprecated: use generateAuthentication instead.
   generatePassword(site, counter = 1, template = 'long') {
     return this.generate(site, counter, null, template, MPW.PasswordNS);
   }
 
   // generate a username with the login namespace
-  //
-  // Deprecated: use generateIdentification instead.
   generateLogin(site, counter = 1, template = 'name') {
     return this.generate(site, counter, null, template, MPW.LoginNS);
   }
 
   // generate a security answer with the answer namespace
-  //
-  // Deprecated: use generateRecovery instead.
   generateAnswer(site, counter = 1, context = '', template = 'phrase') {
     return this.generate(site, counter, context, template, MPW.AnswerNS);
   }
@@ -318,20 +296,18 @@ class MPW {
       .then(function(password) {
         console.assert(
           password === 'ZedaFaxcZaso9*',
-          `Self-test failed; expected: ZedaFaxcZaso9*; got: ${password}`,
+          'Self-test failed; expected: ZedaFaxcZaso9*; got: ' + password
         );
         return password === 'ZedaFaxcZaso9*'
           ? Promise.resolve()
           : Promise.reject(
-              new Error(
-                `Self-test failed; expected: ZedaFaxcZaso9*; got: ${password}`,
-              ),
+              new Error('Self-test failed; expected: ZedaFaxcZaso9*; got: ' + password)
             );
       });
   }
 }
 
-// A TextEncoder in UTF-8 to convert strings to `Uint8Array`s
+// A TextEncoder in UTF-8 to convert strings to "Uint8Array"s
 MPW.txtencoder = new TextEncoder();
 
 // The latest version of MPW supported
@@ -341,14 +317,9 @@ MPW.VERSION = 3;
 MPW.NS = 'com.lyndir.masterpassword';
 
 // The namespaces used in calculateSeed
-MPW.AuthenticationNS = 'com.lyndir.masterpassword';
-MPW.IdentificationNS = 'com.lyndir.masterpassword.login';
-MPW.RecoveryNS = 'com.lyndir.masterpassword.answer';
-
-// Legacy namespaces used in calculateSeed
-MPW.PasswordNS = MPW.AuthenticationNS;
-MPW.LoginNS = MPW.IdentificationNS;
-MPW.AnswerNS = MPW.RecoveryNS;
+MPW.PasswordNS = 'com.lyndir.masterpassword';
+MPW.LoginNS = 'com.lyndir.masterpassword.login';
+MPW.AnswerNS = 'com.lyndir.masterpassword.answer';
 
 // The templates that passwords may be created from
 // The characters map to MPW.passchars
@@ -382,11 +353,7 @@ MPW.templates = {
   short: ['Cvcn'],
   pin: ['nnnn'],
   name: ['cvccvcvcv'],
-  phrase: [
-    'cvcc cvc cvccvcv cvc',
-    'cvc cvccvcvcv cvcv',
-    'cv cvccv cvc cvcvccv',
-  ],
+  phrase: ['cvcc cvc cvccvcv cvc', 'cvc cvccvcvcv cvcv', 'cv cvccv cvc cvcvccv'],
 };
 
 // The password character mapping
@@ -403,5 +370,3 @@ MPW.passchars = {
   x: 'AEIOUaeiouBCDFGHJKLMNPQRSTVWXYZbcdfghjklmnpqrstvwxyz0123456789!@#$%^&*()',
   ' ': ' ',
 };
-
-export default MPW;

@@ -1,12 +1,6 @@
 import React from 'react';
-import {
-  StyleSheet,
-  TouchableHighlight,
-  View,
-  Clipboard,
-  Alert,
-} from 'react-native';
-import { Card, CardProps, Badge } from 'react-native-paper';
+import { StyleSheet, TouchableHighlight, View, Clipboard, Alert } from 'react-native';
+import { Card } from 'react-native-paper';
 
 import { ISite } from '../Site/SitesContext';
 import useMPWPassword from '../MasterPassword/usePassword';
@@ -15,13 +9,17 @@ import { Ionicons } from '@expo/vector-icons';
 
 export interface Props {
   site: ISite;
+  onPress: (site: ISite) => void;
 }
+
+type CardProps = React.ComponentProps<typeof Card>;
 
 function SiteCard({
   site,
+  onPress,
   style,
   ...cardProps
-}: Props & Omit<CardProps, 'children'>) {
+}: Props & Omit<CardProps, 'children' | 'onPress'>) {
   const [showPassword, setShowPassword] = React.useState(false);
   const password = useMPWPassword(site, showPassword);
 
@@ -30,27 +28,29 @@ function SiteCard({
   }
 
   React.useEffect(() => {
-    if (showPassword) {
+    if (password && showPassword) {
       Clipboard.setString(password);
       Alert.alert('Password copied');
     }
-  }, [showPassword]);
+  }, [password, showPassword]);
+
+  function onPressWithSite() {
+    if (!onPress) {
+      return;
+    }
+    onPress(site);
+  }
 
   return (
-    <Card {...cardProps} style={[styles.container, style]}>
+    <Card {...cardProps} onPress={onPressWithSite} style={[styles.container, style]}>
       <Card.Title title={site.name} />
       <Card.Content>
         <TouchableHighlight onPress={togglePasswordVisibility}>
           <View style={styles.password}>
             <PasswordText style={styles.passwordText}>
-              {showPassword ? password : '********'}
+              {password && showPassword ? password : '********'}
             </PasswordText>
-            <Ionicons
-              size={18}
-              color="#000"
-              name="md-copy"
-              style={{ alignSelf: 'center' }}
-            />
+            <Ionicons size={18} color="#000" name="md-copy" style={{ alignSelf: 'center' }} />
           </View>
         </TouchableHighlight>
       </Card.Content>

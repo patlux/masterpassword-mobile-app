@@ -3,9 +3,7 @@
 International License. To view a copy of this license, visit
 http://creativecommons.org/licenses/by/4.0/ or see LICENSE. */
 
-const pbkdf2 = require('./pbkdf2').default;
-
-module.exports.default = (function() {
+window.scrypt = (function() {
   // https://github.com/golang/crypto/blob/master/scrypt/scrypt.go
   function salsaXOR(tmp, inp, out) {
     let w = [];
@@ -152,9 +150,7 @@ module.exports.default = (function() {
     // Check that N is a power of 2 greater than 1 and that we can safely work on it in JS
     if (N < 2 || N & (N - 1 != 0) || N > Number.MAX_SAFE_INTEGER) {
       return Promise.reject(
-        new Error(
-          'Argument N is invalid; N must be > 1, a power of 2 and less than 2^53',
-        ),
+        new Error('Argument N is invalid; N must be > 1, a power of 2 and less than 2^53')
       );
     }
 
@@ -171,10 +167,8 @@ module.exports.default = (function() {
       b = b.then(
         b =>
           new Promise((resolve, reject) =>
-            window.setImmediate(
-              () => (smix(b.subarray(i * 128 * r), r, N, v, x, y), resolve(b)),
-            ),
-          ),
+            window.setImmediate(() => (smix(b.subarray(i * 128 * r), r, N, v, x, y), resolve(b)))
+          )
       );
     }
 

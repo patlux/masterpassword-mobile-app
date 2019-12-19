@@ -1,47 +1,43 @@
 import React from 'react';
-import { Button, Dialog, List, DialogProps } from 'react-native-paper';
+import { Button, Dialog, List } from 'react-native-paper';
+import { FlatList, ListRenderItemInfo } from 'react-native';
 
-import MPW from '../Utils/mpw/mpw';
-import { ScrollView } from 'react-native';
+import { PasswordType, PasswordTypes } from '../Utils/mpw/templates';
 
 export interface Props {
-  onDone: (passwordType: string) => void;
+  onDone: (passwordType: PasswordType) => void;
 }
 
-function DialogPasswordType({
-  onDone,
-  ...props
-}: Props & Omit<DialogProps, 'children'>) {
-  function onSelected(passwordType: string) {
-    return () => {
-      if (!onDone) {
-        return;
-      }
-      onDone(passwordType);
-    };
+type DialogProps = React.ComponentProps<typeof Dialog>;
+
+function DialogPasswordType({ onDone, ...dialogProps }: Props & Omit<DialogProps, 'children'>) {
+  function renderItem({ item: passwordType }: ListRenderItemInfo<PasswordType>) {
+    return (
+      <List.Item key={passwordType} title={passwordType} onPress={() => onDone(passwordType)} />
+    );
   }
 
   return (
-    <Dialog {...props}>
+    <Dialog {...dialogProps}>
       <Dialog.Title>Password types</Dialog.Title>
       <Dialog.ScrollArea>
-        <ScrollView>
-          <List.Section>
-            {Object.keys(MPW.templates).map(passwordTypeKey => (
-              <List.Item
-                key={passwordTypeKey}
-                title={passwordTypeKey}
-                onPress={onSelected(passwordTypeKey)}
-              />
-            ))}
-          </List.Section>
-        </ScrollView>
+        <List.Section>
+          <FlatList
+            keyExtractor={keyExtractorForPasswordType}
+            data={PasswordTypes}
+            renderItem={renderItem}
+          ></FlatList>
+        </List.Section>
       </Dialog.ScrollArea>
       <Dialog.Actions>
-        <Button onPress={props.onDismiss}>Cancel</Button>
+        <Button onPress={dialogProps.onDismiss}>Cancel</Button>
       </Dialog.Actions>
     </Dialog>
   );
+}
+
+function keyExtractorForPasswordType(passwordType: PasswordType): string {
+  return `dialog-password-type-${passwordType}`;
 }
 
 export default DialogPasswordType;

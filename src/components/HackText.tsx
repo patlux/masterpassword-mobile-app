@@ -1,10 +1,10 @@
 import React from 'react';
-import { StyleSheet, Text, TextProps } from 'react-native';
+import { StyleSheet, Text, TextProps, StyleProp, TextStyle } from 'react-native';
 import * as Font from 'expo-font';
 
 export interface Props {
   children: string;
-  style: any;
+  style?: StyleProp<TextStyle>;
 }
 
 const FONT_NAME = 'hack-regular';

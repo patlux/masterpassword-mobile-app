@@ -1,5 +1,6 @@
-import generate, { COLORS } from './IdentIcon';
+import generate from './IdentIcon';
 
 test('IdentIcon', () => {
-  expect(generate('test', 'test')).toBe(['', '']);
+  expect(generate('Peter', 'test')).toEqual(['GREEN', '═▓═⚑']);
+  expect(generate('patrickwozniak', 'testisteinsicherespasswort')).toEqual(['MAGENTA', '═░═☆']);
 });

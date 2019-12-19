@@ -1,13 +1,11 @@
 import React from 'react';
 
-import MPW from '../Utils/mpw/mpw';
-
 export interface IMasterPasswordContext {
-  mpwRef: React.MutableRefObject<MPW>;
+  generatePassword: (site: string, counter: number, template: string) => Promise<string>;
 }
 
 const MasterPasswordContext = React.createContext<IMasterPasswordContext>({
-  mpwRef: null,
+  generatePassword: () => Promise.reject('Not provided'),
 });
 
 export const useMPW = (): IMasterPasswordContext => {
