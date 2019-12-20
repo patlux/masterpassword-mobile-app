@@ -2,6 +2,7 @@
   "expo": {
     "name": "MPW",
     "slug": "mpw",
+    "description": "A (offline) password manager mobile app based on mpw for android & iOS.",
     "privacy": "public",
     "sdkVersion": "36.0.0",
     "platforms": ["ios", "android", "web"],
