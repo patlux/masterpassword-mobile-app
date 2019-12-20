@@ -1,5 +1,6 @@
 {
   "name": "masterpassword-mobile-app",
+  "version": "0.0.0-development",
   "author": "Patrick Wozniak <email@patwoz.de> (https://patwoz.de)",
   "homepage": "https://github.com/patlux/masterpassword-mobile-app",
   "repository": {
@@ -23,7 +24,8 @@
     "format": "npm run prettier -- --write",
     "check-format": "npm run prettier -- --list-different",
     "validate": "npm-run-all --parallel check-types check-format lint test:ci",
-    "commit": "npx git-cz"
+    "commit": "npx git-cz",
+    "semantic-release": "semantic-release"
   },
   "dependencies": {
     "@expo/browser-polyfill": "0.1.0",
@@ -78,6 +80,8 @@
     "lint-staged": "9.5.0",
     "npm-run-all": "4.1.5",
     "prettier": "1.19.1",
+    "semantic-release": "15.13.31",
+    "semantic-release-expo": "2.2.3",
     "typescript": "3.7.2"
   },
   "config": {
