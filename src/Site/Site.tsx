@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Clipboard } from 'react-native';
+import { View, StyleSheet, Clipboard, KeyboardAvoidingView, Platform } from 'react-native';
 import { TextInput, Portal, Button, useTheme } from 'react-native-paper';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useSafeArea } from 'react-native-safe-area-context';
@@ -58,7 +58,11 @@ function Site({ site, onChange, isNew, password }: Props) {
   return (
     <View style={{ flex: 1 }}>
       <ScreenHeader>{isNew ? 'Add' : 'Edit'} site</ScreenHeader>
-      <View style={{ flex: 1, paddingHorizontal: 15 }}>
+      <KeyboardAvoidingView
+        style={{ flex: 1, paddingHorizontal: 15, paddingBottom: 100 }}
+        behavior={Platform.select({ android: 'height', ios: 'padding' })}
+        enabled
+      >
         <TextInput
           mode="flat"
           label="Name"
@@ -114,7 +118,7 @@ function Site({ site, onChange, isNew, password }: Props) {
             +
           </Button>
         </View>
-      </View>
+      </KeyboardAvoidingView>
 
       <TouchableOpacity
         style={[
@@ -137,7 +141,7 @@ function Site({ site, onChange, isNew, password }: Props) {
               {
                 paddingBottom: insets.bottom,
                 color: theme.colors.text,
-                opacity: password ? 1 : 0.5,
+                opacity: 1,
               },
             ]}
           >
