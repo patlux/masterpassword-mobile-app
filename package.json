@@ -57,6 +57,7 @@
   "devDependencies": {
     "@commitlint/cli": "8.2.0",
     "@commitlint/config-conventional": "8.2.0",
+    "@semantic-release/exec": "3.3.8",
     "@types/crypto-js": "3.1.43",
     "@types/jest": "24.0.24",
     "@types/node": "12.7.5",

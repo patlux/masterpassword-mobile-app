@@ -33,5 +33,3 @@ jobs:
       - run: npm run semantic-release
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      - run: expo publish --non-interactive
-      - run: expo build:android --type apk --no-publish --non-interactive --no-wait

@@ -9,6 +9,12 @@
       }
     ],
     "@semantic-release/github",
-    "semantic-release-expo"
+    "semantic-release-expo",
+    [
+      "@semantic-release/exec",
+      {
+        "publishCmd": "./scripts/expo-publish.sh"
+      }
+    ]
   ]
 }
