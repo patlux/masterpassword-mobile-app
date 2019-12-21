@@ -1,9 +1,6 @@
 name: Expo Publish CI
 
-on:
-  push:
-    branches:
-      - master
+on: [push, pull_request]
 
 jobs:
   validate:
@@ -16,7 +13,8 @@ jobs:
       - run: npm ci
       - run: npm run validate
 
-  build:
+  publish:
+    if: github.ref == 'refs/heads/master'
     needs: validate
     runs-on: ubuntu-latest
     steps:
