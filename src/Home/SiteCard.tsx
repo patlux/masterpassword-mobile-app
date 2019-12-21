@@ -1,5 +1,13 @@
 import React from 'react';
-import { StyleSheet, TouchableHighlight, View, Clipboard, Alert } from 'react-native';
+import {
+  StyleSheet,
+  TouchableHighlight,
+  View,
+  Clipboard,
+  Alert,
+  ToastAndroid,
+  Platform,
+} from 'react-native';
 import { Card } from 'react-native-paper';
 
 import { ISite } from '../Site/SitesContext';
@@ -27,10 +35,15 @@ function SiteCard({
     setShowPassword(prevState => !prevState);
   }
 
+  const showPasswordCopiedInfo = Platform.select({
+    android: () => ToastAndroid.show('Password copied', ToastAndroid.SHORT),
+    ios: () => Alert.alert('Password copied'),
+  });
+
   React.useEffect(() => {
     if (password && showPassword) {
       Clipboard.setString(password);
-      Alert.alert('Password copied');
+      showPasswordCopiedInfo();
     }
   }, [password, showPassword]);
 
