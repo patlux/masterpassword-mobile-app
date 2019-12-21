@@ -15,7 +15,7 @@ jobs:
       - run: npm run validate
 
   publish:
-    if: "!contains(github.event.head_commit.message, '[skip ci]')" && github.ref == 'refs/heads/master'
+    if: "!contains(github.event.head_commit.message, '[skip ci]') && github.ref == 'refs/heads/master'"
     needs: validate
     runs-on: ubuntu-latest
     steps:
