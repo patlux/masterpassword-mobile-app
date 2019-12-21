@@ -4,6 +4,7 @@ on: [push, pull_request]
 
 jobs:
   validate:
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
@@ -14,7 +15,7 @@ jobs:
       - run: npm run validate
 
   publish:
-    if: github.ref == 'refs/heads/master'
+    if: "!contains(github.event.head_commit.message, '[skip ci]')" && github.ref == 'refs/heads/master'
     needs: validate
     runs-on: ubuntu-latest
     steps:
