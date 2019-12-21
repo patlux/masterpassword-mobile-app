@@ -6,7 +6,7 @@
     "privacy": "public",
     "sdkVersion": "36.0.0",
     "platforms": ["ios", "android", "web"],
-    "version": "1.0.0",
+    "version": "1.2.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "primaryColor": "#788968",
@@ -22,7 +22,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "de.patwoz.mpw",
-      "buildNumber": "2",
+      "buildNumber": "1.2.0",
       "usesIcloudStorage": false,
       "usesAppleSignIn": false,
       "config": {
@@ -31,7 +31,7 @@
     },
     "android": {
       "package": "de.patwoz.mpw",
-      "versionCode": 2,
+      "versionCode": 360010200,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon-transp.png",
         "backgroundColor": "#788968"
