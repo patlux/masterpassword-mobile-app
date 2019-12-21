@@ -1,8 +1,9 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Button, Paragraph, FAB } from 'react-native-paper';
+import { Button, Paragraph, FAB, Text } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeArea } from 'react-native-safe-area-context';
+import Constants from 'expo-constants';
 
 import SiteList from './SiteList';
 import { ISite, useSites } from '../Site/SitesContext';
@@ -31,6 +32,14 @@ function Home(props: Props): JSX.Element {
     );
   };
 
+  function renderListFooter() {
+    return (
+      <View style={styles.footer}>
+        <Text>v{Constants.manifest.version}</Text>
+      </View>
+    );
+  }
+
   return (
     <>
       <SiteList
@@ -38,6 +47,7 @@ function Home(props: Props): JSX.Element {
         onPressSite={props.onPressSite}
         ListEmptyComponent={renderEmptyList}
         contentContainerStyle={styles.listContentContainer}
+        ListFooterComponent={renderListFooter}
       />
       {props.onPressAddSite && (
         <FAB
@@ -67,6 +77,11 @@ const styles = StyleSheet.create({
   },
   emptyButton: { marginTop: 15 },
   listContentContainer: { flex: 1 },
+  footer: {
+    padding: 15,
+    opacity: 0.5,
+    alignItems: 'center',
+  },
 });
 
 export default Home;
