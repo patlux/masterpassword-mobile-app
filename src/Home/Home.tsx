@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyButton: { marginTop: 15 },
-  listContentContainer: { flex: 1 },
+  listContentContainer: {},
   footer: {
     padding: 15,
     opacity: 0.5,
