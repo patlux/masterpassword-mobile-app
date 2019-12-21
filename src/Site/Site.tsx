@@ -77,15 +77,16 @@ function Site({ site, onChange, isNew, password }: Props) {
           multiline={false}
         />
         <TouchableOpacity onPress={toggleDialog('type')}>
-          <TextInput
-            mode="flat"
-            label="Type"
-            value={site.type}
-            style={{ marginBottom: 10 }}
-            autoFocus={false}
-            multiline={false}
-            disabled={true}
-          />
+          <View pointerEvents="none">
+            <TextInput
+              mode="flat"
+              label="Type"
+              value={site.type}
+              style={{ marginBottom: 10 }}
+              autoFocus={false}
+              multiline={false}
+            />
+          </View>
         </TouchableOpacity>
         <View
           style={{
